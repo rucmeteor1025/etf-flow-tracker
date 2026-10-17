@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ETF 资金流跟踪</title>
+<link rel="icon" href="data:,">
+<script src="echarts.js"
+        onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js';s.onload=retryCharts;s.onerror=function(){window.__no_echarts=true};document.head.appendChild(s)"></script>
+<style>
+:root{--red:#d43a3a;--green:#1e9e50;--bg:#f5f6f8;--card:#fff;--ink:#222;--muted:#777}
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 -apple-system,"PingFang SC",sans-serif;background:var(--bg);color:var(--ink)}
+header{background:#1c2333;color:#fff;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+header h1{font-size:16px;margin:0}header .ts{font-size:12px;opacity:.75}
+nav{display:flex;gap:4px}
+nav button{border:0;background:rgba(255,255,255,.12);color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}
+nav button.on{background:#fff;color:#1c2333;font-weight:600}
+main{max-width:1200px;margin:0 auto;padding:14px}
+.view{display:none}.view.on{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:12px}
+.card{background:var(--card);border-radius:10px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card .k{font-size:12px;color:var(--muted)}.card .v{font-size:20px;font-weight:700;margin-top:2px}
+.card .sub{font-size:11px;color:var(--muted)}
+.up{color:var(--red)}.down{color:var(--green)}
+.panel{background:var(--card);border-radius:10px;padding:12px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.panel h3{margin:0 0 8px;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{padding:4px 6px;text-align:right;border-bottom:1px solid #eef0f3;white-space:nowrap}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+th{color:var(--muted);font-weight:500}
+.winsel button{border:1px solid #ccd;padding:2px 8px;border-radius:5px;background:#fff;cursor:pointer;margin-right:4px;font-size:12px}
+.winsel button.on{background:#1c2333;color:#fff;border-color:#1c2333}
+.chart{width:100%;height:340px}.chart.tall{height:420px}
+.note{font-size:11px;color:var(--muted);margin-top:6px}
+.badge{display:inline-block;padding:0 6px;border-radius:4px;font-size:11px}
+.b-high{background:#fde8e8;color:var(--red)}.b-mid{background:#fff4dc;color:#b8860b}
+.b-low{background:#e8f5ec;color:var(--green)}.b-none{background:#eee;color:#888}
+.refresh-note{font-size:11px;color:var(--muted)}
+@media(max-width:640px){.chart{height:240px}main{padding:8px}}
+</style>
+<script>window.__STATIC_MODE=true</script></head><body>
+<header>
+  <h1>ETF 资金流跟踪</h1>
+  <nav>
+    <button id="tab-m" class="on" onclick="showTab('m')">盘中监控</button>
+    <button id="tab-f" onclick="showTab('f')">申赎日报</button>
+    <button id="tab-h" onclick="showTab('h')">历史研究</button>
+  </nav>
+  <span class="ts" id="page-ts"></span>
+</header>
+<main>
+
+<section id="view-m" class="view on">
+  <div class="cards" id="m-cards"></div>
+  <div class="panel"><h3>当日池分演变（5分钟粒度）</h3><div id="ch-mscore" class="chart"></div></div>
+  <div class="panel"><h3>介入标的成交额节奏 <span class="refresh-note">（当日累计，Top6）</span></h3><div id="ch-mamt" class="chart"></div></div>
+  <div class="panel"><h3>监控池明细（按超额成交=估算介入资金排序）</h3><div style="overflow:auto"><table id="m-table"></table></div>
+    <div class="note">超额成交 = 成交额 − 60日均基准（盘中按已过时间占比折算）。四因子评分（量比异动55/量价背离10/成交加速20/多ETF协同15）是行为异常检测参考列；★=核心7只。</div></div>
+</section>
+
+<section id="view-f" class="view">
+  <div class="cards" id="f-cards"></div>
+  <div class="panel"><h3>净申赎趋势</h3>
+    <div class="winsel" id="f-winsel">
+      <button onclick="setWin(130)">130日</button><button class="on" onclick="setWin(260)">260日</button>
+      <button onclick="setWin(500)">500日</button><button onclick="setWin(9999)">全部</button>
+    </div>
+    <div id="ch-ftrend" class="chart tall"></div>
+    <div class="note">柱=当日净申赎（宽基深色/行业浅色/风格叠加），线=累计净流入（左轴）与上证指数（右轴）。红=净申购，绿=净赎回。</div></div>
+  <div class="panel"><h3>净申购 / 净赎回 Top20</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><b style="color:var(--red)">净申购 Top20</b><div style="overflow:auto"><table id="f-top-buy"></table></div></div>
+      <div><b style="color:var(--green)">净赎回 Top20</b><div style="overflow:auto"><table id="f-top-sell"></table></div></div>
+    </div></div>
+  <div class="panel"><h3>国家队池（22只，★=核心）</h3><div style="overflow:auto"><table id="f-gjd"></table></div></div>
+</section>
+
+<section id="view-h" class="view">
+  <div class="cards" id="h-cards"></div>
+  <div class="panel"><h3>介入评分时间线（日度：当日最高池分）</h3><div id="ch-hscore" class="chart"></div>
+    <div class="note">横线=分级阈值 40（中等）/60（强力）。数据自监控上线起积累。</div></div>
+  <div class="panel"><h3>月度净申赎（股票ETF）</h3><div id="ch-hmonth" class="chart"></div></div>
+  <div class="panel"><h3>年度净申赎</h3><div style="overflow:auto"><table id="h-year"></table></div></div>
+</section>
+
+</main>
+<script>
+const RED='#d43a3a',GREEN='#1e9e50',MUT='#777';
+const fmtDate=s=>s?`${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`:'';
+const f1=v=>v==null?'—':v.toFixed(1);              // 亿元类：1位小数
+const fs1=v=>v==null?'—':(v>0?'+':'')+v.toFixed(1); // 带符号净额：1位小数
+const fmtTip=v=>(v==null||isNaN(v))?'—':(+v).toLocaleString('zh-CN',{minimumFractionDigits:1,maximumFractionDigits:1});
+// tooltip 带单位：units 按系列名配（'*' 为默认）；pair 数据 [x,y] 取 y
+function tipWith(units){return {trigger:'axis',formatter:params=>{
+  let h=params[0].axisValueLabel||params[0].name;
+  for(const p of params){
+    const unit=units[p.seriesName]??units['*']??'';
+    const v=Array.isArray(p.value)?p.value[1]:p.value;
+    h+=`<br/>${p.marker}${p.seriesName} <b>${fmtTip(v)}${unit}</b>`;
+  }
+  return h;}};}
+const charts={};
+function retryCharts(){if(window.__no_echarts)return;loadMonitor();loadFlow();loadHistory();}
+function chart(id){if(window.__no_echarts||!window.echarts)return null;
+  if(!charts[id])charts[id]=echarts.init(document.getElementById(id));return charts[id];}
+window.addEventListener('resize',()=>Object.values(charts).forEach(c=>c.resize()));
+function t2h(t){return `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`}
+function cls(v,inv){if(v==null||v===0)return'';return (inv? v<0 : v>0)?'up':'down'}
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function table(el,cols,rows){
+  let h='<thead><tr>'+cols.map(c=>`<th>${esc(c[1])}</th>`).join('')+'</tr></thead><tbody>';
+  for(const r of rows)h+='<tr>'+cols.map(c=>{
+    let v=r[c[0]],extra=c[2]||(()=>{});
+    if(typeof v==='number')v=v.toLocaleString('zh-CN',{maximumFractionDigits:2});
+    return `<td class="${extra(r)}">${v==null?'—':esc(v)}</td>`}).join('')+'</tr>';
+  el.innerHTML=h+'</tbody>';}
+
+const STATIC=!!window.__STATIC_MODE;
+async function jget(u){const r=await fetch(u);return r.json()}
+// 静态托管模式：flow 全量一次拉取，窗口切换在本地切片（与服务端 tail 语义一致）
+let FLOW_CACHE=null;
+function sliceTrend(t,days){
+  const n=t.dates.length,k=Math.min(days,n),sl=a=>a.slice(n-k);
+  return {dates:sl(t.dates),net:sl(t.net),broad:sl(t.broad),industry:sl(t.industry),
+    style:sl(t.style),cum:sl(t.cum),sh_index:sl(t.sh_index)};
+}
+
+// ── 盘中监控 ─────────────────────────────────────────
+async function loadMonitor(){
+  const s=await jget(STATIC?'data/monitor.json':'/api/monitor');if(s.error)return;
+  document.getElementById('page-ts').textContent='快照 '+s.ts;
+  const g=s.pool_score>=60?'b-high':s.pool_score>=40?'b-mid':s.pool_score>=20?'b-low':'b-none';
+  const lead=s.etfs[0];
+  document.getElementById('m-cards').innerHTML=`
+    <div class="card"><div class="k">综合池分</div><div class="v">${s.pool_score.toFixed(0)}
+      <span class="badge ${g}" style="vertical-align:middle">${s.pool_grade.replace(/^.+?\s/,'')}</span></div>
+      <div class="sub">${esc(s.mode)}</div></div>
+    <div class="card"><div class="k">估算介入资金</div><div class="v ${cls(s.pool_excess_yi)}">${fs1(s.pool_excess_yi)} 亿</div>
+      <div class="sub">全池超额成交合计（超60日均量部分）</div></div>
+    <div class="card"><div class="k">核心7只中位</div><div class="v ${cls(s.bench)}">${(s.bench>0?'+':'')+s.bench}%</div>
+      <div class="sub">协同 k=${s.k_synergy}</div></div>
+    <div class="card"><div class="k">介入最强</div><div class="v" style="font-size:15px">${lead?esc(lead.name)+' ('+lead.code+')':'—'}</div>
+      <div class="sub">${lead?fs1(lead.excess_amt)+'亿 ｜ 现价 '+lead.price.toFixed(3)+'（'+lead.pct.toFixed(2)+'%）':''}</div></div>
+    <div class="card"><div class="k">放量表态数</div><div class="v">${s.etfs.filter(e=>e.ratio>=2).length} 只</div>
+      <div class="sub">量比≥2x</div></div>`;
+  const c1=chart('ch-mscore');
+  if(c1){
+    if(s.series&&s.series.length>1)c1.setOption({
+    tooltip:tipWith({'池分':'分','核心中位%':'%'}),grid:{left:40,right:40,top:20,bottom:24},
+    xAxis:{type:'category',data:s.series.map(p=>t2h(p.t))},
+    yAxis:[{type:'value',name:'池分',max:100},{type:'value',name:'中位%',scale:true,
+      axisLabel:{formatter:'{value}%'}}],
+    series:[{name:'池分',type:'line',step:'end',data:s.series.map(p=>p.s),symbolSize:5,
+      itemStyle:{color:RED},areaStyle:{opacity:.08},markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed'},
+      data:[{yAxis:40},{yAxis:60}]}},
+      {name:'核心中位%',type:'line',yAxisIndex:1,data:s.series.map(p=>p.b),symbol:false,
+      itemStyle:{color:'#3a78d4'},lineStyle:{width:1,opacity:.7}}]},true);
+    else c1.clear();   // 数据不足（如次日第一拍）时清掉昨日残影
+  }
+  const c2=chart('ch-mamt');
+  if(c2){const top=s.etfs.slice(0,6);
+    const series=top.filter(e=>(s.per_code[e.code]||[]).length>1).map(e=>({name:e.name.replace(/ETF.*/,''),
+      type:'line',step:'end',showSymbol:false,data:(s.per_code[e.code]||[]).map(p=>[t2h(p[0]),p[3]])}));
+    c2.setOption({tooltip:tipWith({'*':'亿'}),legend:{top:0,textStyle:{fontSize:11}},
+      grid:{left:50,right:20,top:28,bottom:24},
+      xAxis:{type:'category'},yAxis:{type:'value',name:'成交额(亿)'},
+      series},true);}
+  table(document.getElementById('m-table'),
+    [['name','名称',r=>r.core?'':''],['code','代码',()=>{}],['price','现价'],['pct','涨跌%',r=>cls(r.pct)],
+     ['amount','成交额(亿)'],['excess_amt','超额成交(亿)',r=>cls(parseFloat(r.excess_amt))],
+     ['ratio','量比',r=>r.ratio>=2?'up':''],['excess','超额pp'],
+     ['s_ano','异动'],['s_div','背离'],['s_acc','加速'],['s_syn','协同'],
+     ['total','总分',r=>r.total>=60?'up':r.total>=40?'down':''],['signals','信号']],
+    s.etfs.map(e=>({...e,name:(e.core?'★':'')+e.name,price:e.price.toFixed(3),
+      pct:(e.pct>0?'+':'')+e.pct.toFixed(2),excess:(e.excess>0?'+':'')+e.excess.toFixed(2),
+      amount:e.amount_yi.toFixed(1),excess_amt:fs1(e.excess_amt),ratio:e.ratio.toFixed(1)+'x',
+      s_ano:e.s_ano.toFixed(0),s_div:e.s_div.toFixed(0),s_acc:e.s_acc.toFixed(0),s_syn:e.s_syn.toFixed(0),
+      total:e.total.toFixed(0),signals:e.signals.join('/')})));
+}
+
+// ── 申赎日报 ─────────────────────────────────────────
+let WIN=260;
+function setWin(n){WIN=n;document.querySelectorAll('#f-winsel button').forEach(b=>
+  b.classList.toggle('on',b.textContent==(n>=9999?'全部':n+'日')));loadFlow();}
+async function loadFlow(){
+  let f;
+  if(STATIC){if(!FLOW_CACHE)FLOW_CACHE=await jget('data/flow.json');
+    f={...FLOW_CACHE,days:WIN,trend:sliceTrend(FLOW_CACHE.trend,WIN)};}
+  else f=await jget('/api/flow?days='+WIN);
+  if(f.error)return;
+  const s=f.summary;
+  document.getElementById('f-cards').innerHTML=`
+    <div class="card"><div class="k">数据批次</div><div class="v" style="font-size:16px">${f.date}</div>
+      <div class="sub">A股股票ETF ${s.total} 只</div></div>
+    <div class="card"><div class="k">净申赎</div><div class="v ${cls(s.net)}">${fs1(s.net)} 亿</div>
+      <div class="sub">申购 ${fs1(s.buy)} / 赎回 ${fs1(s.sell)}</div></div>
+    <div class="card"><div class="k">宽基</div><div class="v ${cls(s.buckets['宽基'].net)}">${fs1(s.buckets['宽基'].net)}</div>
+      <div class="sub">${s.buckets['宽基'].count} 只</div></div>
+    <div class="card"><div class="k">行业主题</div><div class="v ${cls(s.buckets['行业主题'].net)}">${fs1(s.buckets['行业主题'].net)}</div>
+      <div class="sub">${s.buckets['行业主题'].count} 只</div></div>
+    <div class="card"><div class="k">风格红利</div><div class="v ${cls(s.buckets['风格红利'].net)}">${fs1(s.buckets['风格红利'].net)}</div>
+      <div class="sub">${s.buckets['风格红利'].count} 只</div></div>
+    <div class="card"><div class="k">股票ETF总规模</div><div class="v" style="font-size:16px">${f1(s.total_mktcap)} 亿</div>
+      <div class="sub">份额 ${f1(s.total_share)} 亿份</div></div>`;
+  const t=f.trend,dates=t.dates.map(fmtDate);
+  const c=chart('ch-ftrend');
+  if(c)c.setOption({tooltip:tipWith({'上证指数':'点','*':'亿'}),legend:{top:0,textStyle:{fontSize:11}},
+    grid:{left:56,right:56,top:28,bottom:44},
+    dataZoom:[{type:'inside'},{type:'slider',height:16,bottom:8}],
+    xAxis:{type:'category',data:dates},
+    yAxis:[{type:'value',name:'净申赎(亿)'},{type:'value',name:'上证',scale:true,splitLine:{show:false}}],
+    series:[
+      {name:'宽基',type:'bar',stack:'n',data:t.broad,itemStyle:{color:'#c96a6a'}},
+      {name:'行业主题',type:'bar',stack:'n',data:t.industry,itemStyle:{color:'#e8a5a5'}},
+      {name:'风格红利',type:'bar',stack:'n',data:t.style,itemStyle:{color:'#f2cfa1'}},
+      {name:'累计净流入',type:'line',data:t.cum,symbol:false,itemStyle:{color:'#1c2333'},lineStyle:{width:2}},
+      {name:'上证指数',type:'line',yAxisIndex:1,data:t.sh_index,symbol:false,
+       itemStyle:{color:'#3a78d4'},lineStyle:{width:1,opacity:.6}}]},true);
+  const mkRows=k=>f[k].map(r=>({name:(typeof r.name==='string'?r.name:r.code).replace('ETF',''),
+    code:r.code,bucket:r.bucket,
+    net:fs1(r.net),pct:r.pct==null?'—':(r.pct>0?'+':'')+r.pct.toFixed(2),
+    amount:f1(r.amount)}));
+  const cols=[['name','名称'],['code','代码'],['bucket','分类'],['net','净申赎(亿)',r=>cls(parseFloat(r.net))],
+    ['pct','涨跌%',r=>cls(parseFloat(r.pct))],['amount','成交额(亿)']];
+  table(document.getElementById('f-top-buy'),cols,mkRows('top_buy'));
+  table(document.getElementById('f-top-sell'),cols,mkRows('top_sell'));
+  table(document.getElementById('f-gjd'),
+    [['name','名称'],['code','代码'],['core','档',()=>{}],['net','净申赎(亿)',r=>cls(parseFloat(r.net))],
+     ['pct','涨跌%',r=>cls(parseFloat(r.pct))],['amount','成交额(亿)']],
+    f.gjd.map(r=>({...r,name:(r.core?'★':'')+(typeof r.name==='string'?r.name:r.code),core:r.core?'核心':'备选',
+      net:fs1(r.net),pct:r.pct==null?'—':(r.pct>0?'+':'')+r.pct.toFixed(2),
+      amount:f1(r.amount)})));
+}
+
+// ── 历史研究 ─────────────────────────────────────────
+async function loadHistory(){
+  const h=await jget(STATIC?'data/history.json':'/api/history');
+  document.getElementById('h-cards').innerHTML=`
+    <div class="card"><div class="k">数据起点</div><div class="v" style="font-size:16px">${h.stats.first_date?fmtDate(h.stats.first_date):'—'}</div>
+      <div class="sub">股票ETF申赎口径</div></div>
+    <div class="card"><div class="k">区间累计净流入</div><div class="v ${cls(h.stats.cum_net)}">${h.stats.cum_net==null?'—':fs1(h.stats.cum_net)+' 亿'}</div>
+      <div class="sub">起点至今</div></div>
+    <div class="card"><div class="k">监控留痕天数</div><div class="v">${h.daily.length} 天</div>
+      <div class="sub">${h.daily.length?h.daily[0].date+' 起':''}</div></div>`;
+  const c1=chart('ch-hscore');
+  if(c1&&h.daily.length)c1.setOption({tooltip:tipWith({'*':'分'}),
+    grid:{left:40,right:20,top:20,bottom:24},
+    xAxis:{type:'category',data:h.daily.map(x=>x.date)},
+    yAxis:{type:'value',max:100},
+    series:[{name:'当日最高池分',type:'bar',data:h.daily.map(x=>x.max),
+      itemStyle:{color:p=>p.value>=60?RED:p.value>=40?'#e0a030':GREEN},
+      markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed'},data:[{yAxis:40},{yAxis:60}]}}]});
+  const c2=chart('ch-hmonth');
+  if(c2&&h.monthly.length)c2.setOption({tooltip:tipWith({'*':'亿'}),
+    grid:{left:56,right:56,top:20,bottom:50},
+    xAxis:{type:'category',data:h.monthly.map(x=>x.month),axisLabel:{rotate:45,fontSize:10}},
+    yAxis:[{type:'value',name:'月净申赎(亿)'},{type:'value',name:'累计',scale:true,splitLine:{show:false}}],
+    series:[{name:'月净申赎',type:'bar',data:h.monthly.map(x=>x.net),
+      itemStyle:{color:p=>p.value>=0?RED:GREEN}},
+      {name:'累计',type:'line',yAxisIndex:1,data:h.monthly.reduce((a,x)=>{a.push((a.length?a[a.length-1]:0)+(x.net||0));return a},[]),
+       symbol:false,itemStyle:{color:'#1c2333'},lineStyle:{width:2}}]},true);
+  table(document.getElementById('h-year'),
+    [['year','年度'],['net','净申赎(亿)',r=>cls(parseFloat(r.net))]],
+    h.yearly.map(y=>({...y,net:fs1(y.net)})));
+}
+
+function showTab(k){
+  ['m','f','h'].forEach(x=>{document.getElementById('view-'+x).classList.toggle('on',x===k);
+    document.getElementById('tab-'+x).classList.toggle('on',x===k)});
+  if(k==='m')loadMonitor();if(k==='f')loadFlow();if(k==='h')loadHistory();
+  Object.values(charts).forEach(c=>c.resize());
+}
+loadMonitor();loadFlow();loadHistory();
+setInterval(()=>{if(document.getElementById('view-m').classList.contains('on'))loadMonitor()},60000);
+</script></body></html>
