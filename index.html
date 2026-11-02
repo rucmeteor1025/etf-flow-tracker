@@ -705,7 +705,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 </section>
 
 <section id="view-h" class="view">
-  <div class="panel" id="panel-etf-campaign"><h3>国家队行为观察：托底、退出与再进场<span class="refresh-note" id="etf-campaign-asof"></span></h3><div id="etf-campaign-state"></div><div id="etf-campaign-lifecycle"></div><details class="campaign-evidence" id="etf-campaign-evidence" ontoggle="if(this.open&&Object.keys(ETF_CAMPAIGN_DATA||{}).length){renderEtfCampaignCockpit(ETF_CAMPAIGN_DATA);Object.values(charts).forEach(c=>c.resize());}"><summary>展开阶段证据：象限、节奏矩阵、协同签名与月度图</summary><div class="campaign-cockpit"><div class="cockpit-card"><h4>行为象限</h4><div class="note" id="etf-behavior-state"></div><div id="ch-etf-behavior" class="chart" style="height:270px"></div><div id="etf-behavior-fallback"></div></div><div class="cockpit-card"><h4>风格申赎 · 集中赎回以来</h4><div class="note" id="etf-defense-state"></div><div id="ch-etf-defense" class="chart" style="height:270px"></div><div id="etf-defense-fallback"></div></div></div><div class="cockpit-wide"><h4>卖出节奏矩阵</h4><div class="cockpit-scroll" id="etf-rhythm"></div><div class="note" id="etf-rhythm-note"></div></div><div class="cockpit-wide"><h4>同指数协同签名</h4><div id="etf-signature"></div></div><div id="etf-campaign-cards"></div><div class="note" id="etf-campaign-note"></div><div id="ch-etf-campaign" class="chart" style="height:330px"></div><div id="etf-campaign-fallback"></div><details class="res-more" id="etf-campaign-details"><summary>数据缺口与成员口径</summary><div id="etf-campaign-issues"></div></details></details></div>
+  <div class="panel" id="panel-etf-campaign"><h3>国家队行为观察：托底、退出与再进场<span class="refresh-note" id="etf-campaign-asof"></span></h3><div id="etf-cycles"></div><details class="campaign-evidence"><summary>历史单轮案例与22只观察池对照</summary><div id="etf-campaign-state"></div><div id="etf-campaign-lifecycle"></div></details><details class="campaign-evidence" id="etf-campaign-evidence" ontoggle="if(this.open&&Object.keys(ETF_CAMPAIGN_DATA||{}).length){renderEtfCampaignCockpit(ETF_CAMPAIGN_DATA);Object.values(charts).forEach(c=>c.resize());}"><summary>展开阶段证据：象限、节奏矩阵、协同签名与月度图</summary><div class="campaign-cockpit"><div class="cockpit-card"><h4>行为象限</h4><div class="note" id="etf-behavior-state"></div><div id="ch-etf-behavior" class="chart" style="height:270px"></div><div id="etf-behavior-fallback"></div></div><div class="cockpit-card"><h4>风格申赎 · 集中赎回以来</h4><div class="note" id="etf-defense-state"></div><div id="ch-etf-defense" class="chart" style="height:270px"></div><div id="etf-defense-fallback"></div></div></div><div class="cockpit-wide"><h4>卖出节奏矩阵</h4><div class="cockpit-scroll" id="etf-rhythm"></div><div class="note" id="etf-rhythm-note"></div></div><div class="cockpit-wide"><h4>同指数协同签名</h4><div id="etf-signature"></div></div><div id="etf-campaign-cards"></div><div class="note" id="etf-campaign-note"></div><div id="ch-etf-campaign" class="chart" style="height:330px"></div><div id="etf-campaign-fallback"></div><details class="res-more" id="etf-campaign-details"><summary>数据缺口与成员口径</summary><div id="etf-campaign-issues"></div></details></details></div>
   <div class="panel rescue-intro"><div class="rescue-heading"><div><h3>历次救市研究</h3><div class="rescue-muted">看介入力度、资金持续性，以及行情有没有扩散</div></div><span class="rescue-tag" id="rescue-asof">读取中</span></div><div id="rescue-current"></div></div>
   <div class="panel"><div class="rescue-heading"><div><h3>逐轮比较</h3><div class="rescue-muted">资金统一比较起点起20个交易日 · 点击一轮看过程</div></div><div class="filters" id="rescue-horizons"><button class="filter" data-days="5" onclick="setRescueHorizon(5)">后5日</button><button class="filter on" data-days="20" onclick="setRescueHorizon(20)">后20日</button><button class="filter" data-days="60" onclick="setRescueHorizon(60)">后60日</button></div></div><div class="rescue-table-scroll"><table id="rescue-compare"></table></div></div>
   <div class="panel" id="rescue-detail"><div class="rescue-heading"><div><h3 id="rescue-title">选择一轮</h3><div class="rescue-muted" id="rescue-context"></div></div><div class="filters" id="rescue-modes"><button class="filter on" data-mode="episode" onclick="setRescueMode('episode')">整轮过程</button><button class="filter" data-mode="first20" onclick="setRescueMode('first20')">首20日</button></div></div>
@@ -1132,7 +1132,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='b52b6c931a39';
+const PAGE_VERSION='6cb380b4a4e0';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1266,6 +1266,18 @@ async function loadEtfEvidence(){
   renderEtfEvidence(d||{error:'证据接口无返回'});return !!d&&!d.error;
 }
 let ETF_CAMPAIGN_DATA={};
+function renderEtfCycles(c){
+ const el=document.getElementById('etf-cycles');if(!el)return;
+ const n=(v,d=2)=>etfeNumber(v)?Number(v).toFixed(d):'—',day=v=>v?fmtDate(v):'—';
+ const labels={support:'持续申购支持',weakening:'支持减弱',redemption:'赎回退出迹象',candidate:'申购增强',intermittent:'支持间歇',observing:'未触发阶段确认',partial_data:'成交数据部分覆盖',missing_data:'数据未齐',insufficient_history:'历史不足',abnormal_turnover_active:'异常成交活跃',normal_turnover:'成交平稳',support_candidate:'日线承接线索',persistent_support_candidate:'持续承接线索',selling_pressure_clue:'日线卖压线索',mixed_direction_clues:'承接与卖压并存',redemption_confirmed:'赎回退出迹象',support_intermittent:'支持间歇'};
+ const x=c.current||{},q=c.secondary?.current||{},ref=c.reference_924,eps=c.episodes||[],active=eps.find(e=>e.id===x.episode_id)||eps.find(e=>!e.end_date);
+ if(!x.date){el.innerHTML='<div class="note">多轮跟踪数据暂不可用。</div>';return;}
+ const cards=[['申赎状态',labels[x.status]||'数据未齐','核心7只 · '+day(x.date)+'；近5日净申赎占规模 '+n(x.f5_pct)+'%，历史 '+n(x.historical_percentile,0)+' 分位'],['持续与协同','近5日 '+n(x.subscription_days_5,0)+' 日净申购','连续 '+n(x.positive_streak,0)+' 日；净申购覆盖 '+n(x.support_groups_5,0)+' 类；20日强度 '+n(x.f20_pct)+'%'],['二级成交与承接',labels[q.status]||'数据未齐','成交覆盖 '+n(q.valid_etfs,0)+'/'+n(q.total_etfs,0)+' 只；其中异常 '+n(q.anomaly_count,0)+' 只；对应指数覆盖 '+n(q.benchmark_valid_etfs,0)+' 只；仅日线线索'],['本轮有效样本积累',active?n(active.amount.net_yi,1)+' 亿':'暂无进行中轮次',active?(x.status==='missing_data'?'本轮保留，当前数据未齐；':'')+'累计规模调整强度 '+n(active.intensity.cumulative_pct)+'%；'+active.amount.valid_days+'/'+active.amount.days+' 日完整':'已结束轮次见下表']];
+ el.innerHTML='<div class="life-story">申赎与二级承接分别跟踪。相同核心7只贯穿历史，资金身份仍是假设。</div><div class="life-answer">'+cards.map(([k,v,t])=>`<div class="life-card"><span>${esc(k)}</span><b>${esc(v)}</b><small>${esc(t)}</small></div>`).join('')+'</div>'+
+ (ref?`<div class="life-note"><b>924前积累参照</b> · ${day(ref.start)}—${day(ref.end)}：有效样本净申赎 ${n(ref.amount.net_yi,1)} 亿，规模调整累计 ${n(ref.intensity.cumulative_pct)}%，${ref.amount.valid_days}/${ref.amount.days} 日完整。${active&&etfeNumber(active.reference_intensity_ratio)?'本轮有效样本强度为参照的 '+n(active.reference_intensity_ratio*100,1)+'%。':''}这是历史量级比较，不是持仓、投入进度或政策时点预测。</div>`:'')+
+ `<div class="life-scroll"><table class="life-table"><thead><tr><th>轮次</th><th>出现／确认</th><th>结束与原因</th><th>净申赎样本</th><th>规模调整累计</th></tr></thead><tbody>${eps.slice().reverse().map(e=>`<tr><td>第${e.id}轮</td><td>${day(e.candidate_start)}<br><small>确认 ${day(e.confirmed_at)}</small></td><td>${e.end_date?day(e.end_date):'进行中'}<br><small>${esc(labels[e.end_reason]||'')}</small></td><td>${n(e.amount.net_yi,1)} 亿<br><small>${e.amount.valid_days}/${e.amount.days} 日完整</small></td><td>${n(e.intensity.cumulative_pct)}%<br><small>按每日前日资产调整</small></td></tr>`).join('')||'<tr><td colspan="5">尚无满足持续与协同条件的申购轮次。</td></tr>'}</tbody></table></div><details class="campaign-evidence"><summary>查看识别依据</summary><div class="note">支持需近5日强度达到此前252日的90分位、至少3日净申购且覆盖2类，最近3日两次出现才确认；维持门槛降至60分位，连续5日不满足则减弱，减弱且连续10日没有强支持则间歇。异常赎回按10分位反向确认。历史至少120有效日，缺数据打断连续计数。历史首次披露时间缺失，回放按延迟1—2日检验。以上为初始规则，尚非经验证的交易策略。</div></details>`;
+}
+
 function renderEtfLifecycle(campaign){
   const life=campaign.lifecycle||{},stages=life.stages||[],dep=life.depletion||[],top=life.market_top||{};
   const money=v=>etfeNumber(v)?(v>0?'+':'')+Number(v).toFixed(1)+' 亿':'—';
@@ -1330,6 +1342,7 @@ function renderEtfCampaign(campaign){
   const day=v=>v?fmtDate(v):'—';
   document.getElementById('etf-campaign-asof').textContent=campaign.as_of?'申赎截至 '+day(campaign.as_of):'';
   ETF_CAMPAIGN_DATA=campaign||{};
+  renderEtfCycles(campaign.cycles||{});
   renderEtfLifecycle(campaign);
   renderEtfCampaignCockpit(campaign);
   const card=(p,key)=>{
