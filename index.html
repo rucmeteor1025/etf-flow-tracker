@@ -1166,7 +1166,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='e422d3e1b0f0';
+const PAGE_VERSION='75956c7fcb1e';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1387,6 +1387,7 @@ function renderGjdCycle(g,pulse){
   }
   const p=g.current||{}, months=p.months||[], stages=g.stages||[], events=g.events||[];
   const c7=g.core7||{}, c7cur=c7.current_713||{}, c7stages=c7.stages||[];
+  const b19=g.broad19||{}, bcur=b19.current_713||{}, bstages=b19.stages||[];
   const money=v=>v==null?'—':(Number(v)>0?'+':'')+Number(v).toFixed(1)+' 亿';
   const pct=v=>v==null?'—':(Number(v)>0?'+':'')+Number(v).toFixed(2)+'%';
   const day=v=>v?fmtDate(v):'—';
@@ -1394,10 +1395,10 @@ function renderGjdCycle(g,pulse){
   if(asof)asof.textContent='申赎截至 '+day(g.as_of)+' · 份额代理';
   const oct=g.october||{}, sep=g.september||{};
   const vs=g.reference||{};
-  hero.innerHTML=`<div class="gjd-kicker">阶段：再进场 · 本轮 ${day(p.start)} → ${day(p.end)} · ${completeTxt}${p.end&&g.as_of&&String(p.end)>String(g.as_of)?' · '+day(p.end)+' 待披露':''}${c7.current_716?.official_yi!=null?' · 7/16起核心7 '+money(c7.current_716.official_yi):''}</div>
+  hero.innerHTML=`<div class="gjd-kicker">阶段：再进场 · 本轮 ${day(p.start)} → ${day(p.end)} · ${completeTxt}${p.end&&g.as_of&&String(p.end)>String(g.as_of)?' · '+day(p.end)+' 待披露':''}${b19.current_716?.official_yi!=null?' · 7/16起全宽基 '+money(b19.current_716.official_yi):''}${c7.current_716?.official_yi!=null?' · 核心7 '+money(c7.current_716.official_yi):''}</div>
     <div class="gjd-verdict">${esc(p.conclusion||'方向待确认')}</div>
     <div class="gjd-kpis">
-      <div class="gjd-kpi current"><span>核心7只份额折算（主口径）</span><b class="${cls(c7cur.official_yi)}">${money(c7cur.official_yi)}</b><small>22只观察池 ${money(p.official_yi)} · 不含非核心宽基/风格</small></div>
+      <div class="gjd-kpi current"><span>全宽基19只份额折算（主口径）</span><b class="${cls(bcur.official_yi)}">${money(bcur.official_yi)}</b><small>核心7只 ${money(c7cur.official_yi)} · 22只全池 ${money(p.official_yi)}</small></div>
       <div class="gjd-kpi sell"><span>二级方向性放量差（代理）</span><b class="${cls(p.proxy_yi)}">${money(p.proxy_yi)}</b><small>上涨日 ${money(p.proxy_buy)} / 下跌日 ${money(p.proxy_sell)} · 差率 ${p.proxy_imbalance_pct!=null?pct(p.proxy_imbalance_pct):'—'} · 不是净买入</small></div>
       <div class="gjd-kpi"><span>同期上证</span><b class="${cls(p.index_pct)}">${pct(p.index_pct)}</b><small>${day(p.start)} → ${day(p.end)} · 当前${p.index_pct<0?'下跌':'上涨'}</small></div>
       <div class="gjd-kpi"><span>2026-10 份额申购（22只）</span><b class="${cls(oct.official_yi)}">${money(oct.official_yi)}</b><small>9月 ${money(sep.official_yi)} · 10月${oct.official_yi>sep.official_yi?'明显加速':'未加速'}</small></div>
@@ -1415,10 +1416,10 @@ function renderGjdCycle(g,pulse){
     }
   }
   document.getElementById('gjd-cycle-events').innerHTML=events.map(e=>`<span class="gjd-event ${esc(e.type||'')}">${day(e.date)} ${esc(e.label||'')}</span>`).join('');
-  document.getElementById('gjd-cycle-stages').innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>阶段</th><th>区间</th><th>22只份额折算</th><th>核心7只</th><th title="上涨日超额成交−下跌日超额成交，不是二级净买入">二级方向性放量差</th><th>上证</th><th>状态</th></tr></thead><tbody>${stages.map(s=>{const c=c7stages.find(x=>x.key===s.key)||{};return `<tr class="${s.key==='reentry'?'current':s.key==='distribution'?'distribution':''}"><td>${esc(s.label||'')}</td><td>${day(s.start)} → ${day(s.end)}</td><td class="${cls(s.official_yi)}">${money(s.official_yi)}</td><td class="${cls(c.official_yi)}">${money(c.official_yi)}</td><td class="${cls(s.proxy_yi)}">${money(s.proxy_yi)}</td><td class="${cls(s.index_pct)}">${pct(s.index_pct)}</td><td>${s.complete?'完整':(s.valid_days??'—')+'/'+(s.days??'—')+'日'}</td></tr>`}).join('')}</tbody></table></div>
+  document.getElementById('gjd-cycle-stages').innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>阶段</th><th>区间</th><th>22只</th><th>全宽基19</th><th>核心7</th><th title="上涨日超额成交−下跌日超额成交，不是二级净买入">二级方向性放量差</th><th>上证</th><th>状态</th></tr></thead><tbody>${stages.map(s=>{const c=c7stages.find(x=>x.key===s.key)||{};const b=bstages.find(x=>x.key===s.key)||{};return `<tr class="${s.key==='reentry'?'current':s.key==='distribution'?'distribution':''}"><td>${esc(s.label||'')}</td><td>${day(s.start)} → ${day(s.end)}</td><td class="${cls(s.official_yi)}">${money(s.official_yi)}</td><td class="${cls(b.official_yi)}">${money(b.official_yi)}</td><td class="${cls(c.official_yi)}">${money(c.official_yi)}</td><td class="${cls(s.proxy_yi)}">${money(s.proxy_yi)}</td><td class="${cls(s.index_pct)}">${pct(s.index_pct)}</td><td>${s.complete?'完整':(s.valid_days??'—')+'/'+(s.days??'—')+'日'}</td></tr>`}).join('')}</tbody></table></div>
     <div class="note">份额折算 vs 二级方向性放量差不是同一渠道，不能相加；阶段由份额流与固定核心池识别，不是账户身份确认。二级方向性放量差 = 上涨日超额成交 − 下跌日超额成交，是成交方向差，不是二级净买入。</div>`;
   document.getElementById('gjd-cycle-months').innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>月份</th><th>22只份额折算</th><th title="上涨日超额成交−下跌日超额成交，不是二级净买入">二级方向性放量差</th><th>状态</th></tr></thead><tbody>${months.map(m=>`<tr><td>${esc(m.month||'')}</td><td class="${cls(m.official_yi)}">${money(m.official_yi)}</td><td class="${cls(m.proxy_yi)}">${money(m.proxy_yi)}</td><td>${m.complete?'完整':(m.valid_days??0)+'/'+(m.days??0)+'日'}</td></tr>`).join('')}</tbody></table></div>`;
-  document.getElementById('gjd-cycle-watch').innerHTML=`<b>接下来看什么</b>：${(g.watch||[]).map(esc).join(' · ')}<br><b>历史量级</b>：核心7只本轮为924前的 ${c7.current_ratio!=null?(c7.current_ratio*100).toFixed(1)+'%':'—'}（22池 ${vs.current_vs_pre924!=null?(vs.current_vs_pre924*100).toFixed(1)+'%':'—'}）；强度为参照的 ${vs.intensity_ratio!=null?(vs.intensity_ratio*100).toFixed(1)+'%':'—'}。历史比较不是持仓或进度。`;
+  document.getElementById('gjd-cycle-watch').innerHTML=`<b>接下来看什么</b>：${(g.watch||[]).map(esc).join(' · ')}<br><b>历史量级</b>：全宽基19本轮为924前的 ${b19.current_ratio!=null?(b19.current_ratio*100).toFixed(1)+'%':'—'}（核心7 ${c7.current_ratio!=null?(c7.current_ratio*100).toFixed(1)+'%':'—'} · 22池 ${vs.current_vs_pre924!=null?(vs.current_vs_pre924*100).toFixed(1)+'%':'—'}）；强度为参照的 ${vs.intensity_ratio!=null?(vs.intensity_ratio*100).toFixed(1)+'%':'—'}。历史比较不是持仓或进度。`;
   document.getElementById('gjd-cycle-method').innerHTML=`<div class="gjd-method"><p><b>${esc(g.method?.answer||'')}</b></p><p>${esc(g.method?.primary||'')}</p><p>${esc(g.method?.secondary||'')}</p><p>${esc(g.method?.identity||'')}</p></div>`;
 }
 function renderEtfCampaign(campaign){
@@ -1571,7 +1572,7 @@ function renderEtfDailyHero(f){
   const s=f.summary||{}, sig=f.signal||{}, se=f.sensitivity||{}, b=s.buckets||{}, st=f.pool_share_status||{};
   const money=v=>v==null||!isFinite(Number(v))?'—':(Number(v)>0?'+':'')+Number(v).toFixed(1)+' 亿';
   const pct=v=>v==null?'—':Number(v).toFixed(1)+'%';
-  const gjd=f.gjd_net, five=sig.gjd_5d, core=se.core7, gjd22=se.gjd22;
+  const gjd=f.gjd_net, five=sig.gjd_5d, core=se.core7, gjd22=se.gjd22, broad19=se.broad19;
   const broad=(b['宽基']||{}).net, ind=(b['行业主题']||{}).net, style=(b['风格红利']||{}).net;
   const asof=document.getElementById('etf-daily-asof'); if(asof)asof.textContent='完整披露 '+(f.date||'—');
   const fiveNote=sig.roll5_pct!=null?`${pct(sig.roll5_pct)} 历史分位`:'五日历史不足';
@@ -1581,7 +1582,7 @@ function renderEtfDailyHero(f){
       <div class="gjd-kpi current"><span>观察池当日净申赎</span><b class="${cls(gjd)}">${money(gjd)}</b><small>22只 · 份额差×收盘价</small></div>
       <div class="gjd-kpi"><span>近5日观察池</span><b class="${cls(five)}">${money(five)}</b><small>${fiveNote} · 日频累计</small></div>
       <div class="gjd-kpi"><span>核心7只当日</span><b class="${cls(core)}">${money(core)}</b><small>核心宽基 · 高信号子集</small></div>
-      <div class="gjd-kpi"><span>22只观察池当日</span><b class="${cls(gjd22)}">${money(gjd22)}</b><small>含非核心宽基/风格</small></div>
+      <div class="gjd-kpi"><span>全宽基19只当日</span><b class="${cls(broad19)}">${money(broad19)}</b><small>22只全池 ${money(gjd22)} · 风格/行业另列</small></div>
     </div>
     <div class="gjd-caveat">当日结构：宽基 ${money(broad)} · 行业主题 ${money(ind)} · 风格红利 ${money(style)}。份额变动含所有持有人，不是国家队身份；不含二级交易。</div>
     <div class="etf-hero-note"><button class="mini" onclick="toggleFlowDetails()">展开结构/TOP20/观察池明细</button><button class="mini" style="margin-left:6px" onclick="showTab('h')">查看本轮累计 →</button></div>`;
