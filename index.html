@@ -664,7 +664,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 <div class="subtabs" id="nav-sub">
   <button id="tab-m" class="on" onclick="showTab('m')">盘中监控</button>
   <button id="tab-f" onclick="showTab('f')">申赎日报</button>
-  <button id="tab-h" onclick="showTab('h')">历史研究</button>
+  <button id="tab-h" onclick="showTab('h')">国家队跟踪</button>
 </div>
 <section id="view-m" class="view on">
   <div class="panel"><h3>ETF 申赎与成交证据<span class="refresh-note" id="etfe-asof"></span></h3><div class="note" id="etfe-summary" hidden></div><div class="cards" id="etfe-cards"></div><div class="etf-pool-head"><span>量能对照</span><span id="etf-pool-basis"></span></div><div id="etf-pool-compare"></div></div>
@@ -724,7 +724,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 
 <section id="view-h" class="view">
   <div class="panel gjd-cycle-panel" id="panel-gjd-cycle">
-    <div class="gjd-head"><h3>国家队周期 · 2023 至今</h3><span class="refresh-note" id="gjd-cycle-asof"></span></div>
+    <div class="gjd-head"><h3>国家队跟踪 · 2023 至今</h3><span class="refresh-note" id="gjd-cycle-asof"></span></div>
     <div id="gjd-cycle-hero"></div>
     <div id="gjd-cycle-pulse" class="gjd-pulse"></div>
     <div id="gjd-cycle-events" class="gjd-events"></div>
@@ -734,19 +734,20 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
     </div>
     <div id="gjd-cycle-watch" class="gjd-watch"></div>
     <details class="campaign-evidence"><summary>口径：ETF 份额能不能直接当国家队？</summary><div id="gjd-cycle-method"></div></details>
-    <div style="margin-top:6px"><button class="mini" onclick="document.getElementById('panel-etf-campaign').style.display='';">展开旧版详细证据</button></div>
+    <div style="margin-top:6px"><button class="mini" onclick="document.getElementById('panel-etf-campaign').style.display='';">展开旧版周期证据</button>
+      <button class="mini" onclick="toggleGjdLegacy()">展开历史逐轮明细</button></div>
   </div>
   <div class="panel" id="panel-etf-campaign" style="display:none"><h3>国家队行为观察：托底、退出与再进场<span class="refresh-note" id="etf-campaign-asof"></span></h3><div id="etf-cycles"></div><details class="campaign-evidence"><summary>历史单轮案例与22只观察池对照</summary><div id="etf-campaign-state"></div><div id="etf-campaign-lifecycle"></div></details><details class="campaign-evidence" id="etf-campaign-evidence" ontoggle="if(this.open&&Object.keys(ETF_CAMPAIGN_DATA||{}).length){renderEtfCampaignCockpit(ETF_CAMPAIGN_DATA);Object.values(charts).forEach(c=>c.resize());}"><summary>展开阶段证据：象限、节奏矩阵、协同签名与月度图</summary><div class="campaign-cockpit"><div class="cockpit-card"><h4>行为象限</h4><div class="note" id="etf-behavior-state"></div><div id="ch-etf-behavior" class="chart" style="height:270px"></div><div id="etf-behavior-fallback"></div></div><div class="cockpit-card"><h4>风格申赎 · 集中赎回以来</h4><div class="note" id="etf-defense-state"></div><div id="ch-etf-defense" class="chart" style="height:270px"></div><div id="etf-defense-fallback"></div></div></div><div class="cockpit-wide"><h4>卖出节奏矩阵</h4><div class="cockpit-scroll" id="etf-rhythm"></div><div class="note" id="etf-rhythm-note"></div></div><div class="cockpit-wide"><h4>同指数协同签名</h4><div id="etf-signature"></div></div><div id="etf-campaign-cards"></div><div class="note" id="etf-campaign-note"></div><div id="ch-etf-campaign" class="chart" style="height:330px"></div><div id="etf-campaign-fallback"></div><details class="res-more" id="etf-campaign-details"><summary>数据缺口与成员口径</summary><div id="etf-campaign-issues"></div></details></details></div>
-  <div class="panel rescue-intro"><div class="rescue-heading"><div><h3>历次救市研究</h3><div class="rescue-muted">看介入力度、资金持续性，以及行情有没有扩散</div></div><span class="rescue-tag" id="rescue-asof">读取中</span></div><div id="rescue-current"></div></div>
-  <div class="panel"><div class="rescue-heading"><div><h3>逐轮比较</h3><div class="rescue-muted">资金统一比较起点起20个交易日 · 点击一轮看过程</div></div><div class="filters" id="rescue-horizons"><button class="filter" data-days="5" onclick="setRescueHorizon(5)">后5日</button><button class="filter on" data-days="20" onclick="setRescueHorizon(20)">后20日</button><button class="filter" data-days="60" onclick="setRescueHorizon(60)">后60日</button></div></div><div class="rescue-table-scroll"><table id="rescue-compare"></table></div></div>
-  <div class="panel" id="rescue-detail"><div class="rescue-heading"><div><h3 id="rescue-title">选择一轮</h3><div class="rescue-muted" id="rescue-context"></div></div><div class="filters" id="rescue-modes"><button class="filter on" data-mode="episode" onclick="setRescueMode('episode')">整轮过程</button><button class="filter" data-mode="first20" onclick="setRescueMode('first20')">首20日</button></div></div>
+  <div class="panel rescue-intro" id="rescue-intro" style="display:none"><div class="rescue-heading"><div><h3>历次救市研究</h3><div class="rescue-muted">看介入力度、资金持续性，以及行情有没有扩散</div></div><span class="rescue-tag" id="rescue-asof">读取中</span></div><div id="rescue-current"></div></div>
+  <div class="panel" id="rescue-compare-panel" style="display:none"><div class="rescue-heading"><div><h3>逐轮比较</h3><div class="rescue-muted">资金统一比较起点起20个交易日 · 点击一轮看过程</div></div><div class="filters" id="rescue-horizons"><button class="filter" data-days="5" onclick="setRescueHorizon(5)">后5日</button><button class="filter on" data-days="20" onclick="setRescueHorizon(20)">后20日</button><button class="filter" data-days="60" onclick="setRescueHorizon(60)">后60日</button></div></div><div class="rescue-table-scroll"><table id="rescue-compare"></table></div></div>
+  <div class="panel" id="rescue-detail" style="display:none"><div class="rescue-heading"><div><h3 id="rescue-title">选择一轮</h3><div class="rescue-muted" id="rescue-context"></div></div><div class="filters" id="rescue-modes"><button class="filter on" data-mode="episode" onclick="setRescueMode('episode')">整轮过程</button><button class="filter" data-mode="first20" onclick="setRescueMode('first20')">首20日</button></div></div>
     <div id="rescue-verdict" class="rescue-verdict"></div><div id="rescue-kpis" class="rescue-kpis"></div>
     <div class="rescue-heading rescue-chart-heading"><b>指数先后与强弱</b><span class="rescue-muted" id="rescue-chart-dates"></span></div><div id="ch-rescue-price" class="chart" style="height:300px"></div><div id="rescue-index-fallback" hidden></div>
     <div class="rescue-heading rescue-chart-heading"><b>每日净申赎</b><span class="rescue-muted">亿元 · 红申购 / 绿赎回</span></div><div id="ch-rescue-flow" class="chart" style="height:180px"></div>
     <div class="rescue-heading rescue-chart-heading"><b>主要扩张 / 收缩的ETF</b><span class="rescue-muted" id="rescue-etf-range"></span></div><div class="rescue-table-scroll"><table id="rescue-etfs"></table></div><details class="rescue-more"><summary id="rescue-all-label">全部ETF明细</summary><div class="rescue-table-scroll"><table id="rescue-all-etfs"></table></div></details>
     <details class="rescue-more"><summary>区间、缺口与来源</summary><div id="rescue-method"></div></details>
   </div>
-  <details class="panel" ontoggle="if(this.open)safeLoad(loadHistory).then(()=>Object.values(charts).forEach(c=>c.resize()))"><summary>长期申赎统计</summary>
+  <details class="panel" id="longterm-panel" style="display:none" ontoggle="if(this.open)safeLoad(loadHistory).then(()=>Object.values(charts).forEach(c=>c.resize()))"><summary>长期申赎统计</summary>
   <div class="panel"><h3>资金进出回顾</h3><div class="note" id="etfe-history-note">正在读取历史数据…</div><div id="etfe-history-result" class="brief-note"></div><div style="overflow:auto"><table id="etfe-period-summary"></table></div><details><summary>各阶段明细</summary><div style="overflow:auto"><table id="etfe-periods"></table></div></details><details><summary>每月买入、赎回情况</summary><div style="overflow:auto"><table id="etfe-monthly"></table></div></details><div style="overflow:auto"><table id="etfe-prices"></table></div></div>
   <details class="panel"><summary>更多历史统计</summary><div id="h-brief" class="brief"></div>
   <div class="cards" id="h-cards"></div>
@@ -1163,7 +1164,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='c2335e065742';
+const PAGE_VERSION='ebd59937d1e4';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1364,6 +1365,13 @@ function renderEtfCampaignCockpit(campaign){
   document.getElementById('etf-rhythm-note').textContent=rhythm.note||'';
   document.getElementById('etf-signature').innerHTML=signature.status!=='available'?`<div class="note">${esc(signature.reason||signature.note||'未出现协同签名。')}</div>`:`<div class="signature-grid"><div class="signature-kpi"><span>首次协同</span><b>${day(signature.first_date)}</b><small>${signature.strongest?day(signature.strongest.date)+' 最强':''}</small></div><div class="signature-kpi"><span>最强同日家数</span><b>${signature.strongest?.count??'—'} / 4</b><small>${esc(signature.strongest?.strongest_code||'')} ${money(signature.strongest?.strongest_yi)}</small></div><div class="signature-kpi"><span>协同触发日</span><b>${signature.trigger_days}</b><small>同日≥2只各赎回≥100亿</small></div><div class="signature-kpi"><span>最长连续</span><b>${signature.max_streak}日</b><small>${esc(signature.note||'')}</small></div></div><div class="cockpit-scroll"><table class="signature-table" id="etf-signature-days"></table></div>`;
   if(signature.status==='available')etfeRows('etf-signature-days',['日期','协同家数','协同赎回合计','最强ETF','最强单日'],(signature.days||[]).map(x=>[day(x.date),x.count+' / 4',money(x.total_yi),esc(x.strongest_code),money(x.strongest_yi)]));
+}
+function toggleGjdLegacy(){
+  const ids=['rescue-intro','rescue-compare-panel','rescue-detail','longterm-panel'];
+  const first=document.getElementById('rescue-intro');
+  const show=first && first.style.display==='none';
+  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=show?'':'none';});
+  if(show)Object.values(charts).forEach(c=>{try{c.resize()}catch(e){}});
 }
 function renderGjdCycle(g,pulse){
   const hero=document.getElementById('gjd-cycle-hero');
