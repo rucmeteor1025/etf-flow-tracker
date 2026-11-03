@@ -389,6 +389,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 .gjd-kpi{border:1px solid #e1e6ed;border-radius:8px;padding:9px 11px;background:#fafbfc;min-width:0}
 .gjd-kpi span{display:block;font-size:11px;color:#7b8493}.gjd-kpi b{display:block;font-size:20px;margin:3px 0;font-variant-numeric:tabular-nums}.gjd-kpi small{display:block;font-size:10px;color:#697789;line-height:1.45}
 .gjd-kpi.current{border-left:3px solid #c74d4d;background:#fff8f7}.gjd-kpi.sell{border-left:3px solid #ad833d;background:#fffaf3}
+.gjd-pulse{margin:8px 0 4px}.gjd-pulse-card{border:1px solid #dfe5ed;border-left:4px solid #607c9f;border-radius:8px;padding:8px 11px;background:#f8fafc;font-size:11.5px;line-height:1.65;color:#43526a}.gjd-pulse-card b{color:#1c2333}.gjd-pulse-card .gjd-pulse-note{font-size:10px;color:#7b8493;margin-top:3px}.gjd-pulse-close{border-left-color:#ad833d;background:#fffaf3}
 .gjd-events{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0}
 .gjd-event{font-size:10px;border-radius:10px;padding:3px 8px;background:#f1f3f6;color:#4b5563}.gjd-event.accelerate{background:#fde8e8;color:#b42318}.gjd-event.distribution{background:#fff1e0;color:#ad5a00}.gjd-event.reentry{background:#e8f5ec;color:#1e7a3c}
 .gjd-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;margin-top:8px}.gjd-block{min-width:0}.gjd-block h4{margin:0 0 5px;font-size:12px;color:#4c5d72}
@@ -725,6 +726,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
   <div class="panel gjd-cycle-panel" id="panel-gjd-cycle">
     <div class="gjd-head"><h3>国家队周期 · 2023 至今</h3><span class="refresh-note" id="gjd-cycle-asof"></span></div>
     <div id="gjd-cycle-hero"></div>
+    <div id="gjd-cycle-pulse" class="gjd-pulse"></div>
     <div id="gjd-cycle-events" class="gjd-events"></div>
     <div class="gjd-grid">
       <div class="gjd-block"><h4>五阶段复盘</h4><div id="gjd-cycle-stages"></div></div>
@@ -1161,7 +1163,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='1bdd1b22015f';
+const PAGE_VERSION='bbf1448875ea';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1363,14 +1365,14 @@ function renderEtfCampaignCockpit(campaign){
   document.getElementById('etf-signature').innerHTML=signature.status!=='available'?`<div class="note">${esc(signature.reason||signature.note||'未出现协同签名。')}</div>`:`<div class="signature-grid"><div class="signature-kpi"><span>首次协同</span><b>${day(signature.first_date)}</b><small>${signature.strongest?day(signature.strongest.date)+' 最强':''}</small></div><div class="signature-kpi"><span>最强同日家数</span><b>${signature.strongest?.count??'—'} / 4</b><small>${esc(signature.strongest?.strongest_code||'')} ${money(signature.strongest?.strongest_yi)}</small></div><div class="signature-kpi"><span>协同触发日</span><b>${signature.trigger_days}</b><small>同日≥2只各赎回≥100亿</small></div><div class="signature-kpi"><span>最长连续</span><b>${signature.max_streak}日</b><small>${esc(signature.note||'')}</small></div></div><div class="cockpit-scroll"><table class="signature-table" id="etf-signature-days"></table></div>`;
   if(signature.status==='available')etfeRows('etf-signature-days',['日期','协同家数','协同赎回合计','最强ETF','最强单日'],(signature.days||[]).map(x=>[day(x.date),x.count+' / 4',money(x.total_yi),esc(x.strongest_code),money(x.strongest_yi)]));
 }
-function renderGjdCycle(g){
+function renderGjdCycle(g,pulse){
   const hero=document.getElementById('gjd-cycle-hero');
   if(!hero)return;
   const asof=document.getElementById('gjd-cycle-asof');
   if(!g||g.status!=='ready'){
     if(asof)asof.textContent='';
     hero.innerHTML='<div class="note">'+esc((g&&g.reason)||'周期数据暂不可用')+'</div>';
-    ['gjd-cycle-events','gjd-cycle-stages','gjd-cycle-months','gjd-cycle-watch','gjd-cycle-method'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
+    ['gjd-cycle-pulse','gjd-cycle-events','gjd-cycle-stages','gjd-cycle-months','gjd-cycle-watch','gjd-cycle-method'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
     return;
   }
   const p=g.current||{}, months=p.months||[], stages=g.stages||[], events=g.events||[];
@@ -1385,14 +1387,26 @@ function renderGjdCycle(g){
     <div class="gjd-verdict">${esc(p.conclusion||'方向待确认')}</div>
     <div class="gjd-kpis">
       <div class="gjd-kpi current"><span>份额变动折算（代理）</span><b class="${cls(p.official_yi)}">${money(p.official_yi)}</b><small>官方份额差×收盘价 · 不识别账户</small></div>
-      <div class="gjd-kpi sell"><span>二级方向差额（代理）</span><b class="${cls(p.proxy_yi)}">${money(p.proxy_yi)}</b><small>方向性超额成交 · 不是实买</small></div>
+      <div class="gjd-kpi sell"><span>二级方向性放量差（代理）</span><b class="${cls(p.proxy_yi)}">${money(p.proxy_yi)}</b><small>上涨日 ${money(p.proxy_buy)} / 下跌日 ${money(p.proxy_sell)} · 差率 ${p.proxy_imbalance_pct!=null?pct(p.proxy_imbalance_pct):'—'} · 不是净买入</small></div>
       <div class="gjd-kpi"><span>同期上证</span><b class="${cls(p.index_pct)}">${pct(p.index_pct)}</b><small>${day(p.start)} → ${day(p.end)} · 当前${p.index_pct<0?'下跌':'上涨'}</small></div>
       <div class="gjd-kpi"><span>2026-10 份额申购</span><b class="${cls(oct.official_yi)}">${money(oct.official_yi)}</b><small>9月 ${money(sep.official_yi)} · 10月${oct.official_yi>sep.official_yi?'明显加速':'未加速'}</small></div>
     </div><div class="gjd-caveat">${esc(g.method?.answer||'ETF份额变化只能作为代理，不能直接等同国家队。')}</div>`;
+  const pl=pulse||{}, latest=pl.latest||{}, p30=pl.total_30m||{}, p60=pl.total_60m||{};
+  const pulseEl=document.getElementById('gjd-cycle-pulse');
+  if(pulseEl){
+    if(pl.status==='estimated'&&latest.end){
+      const isClose=pl.freshness&&pl.freshness.status==='close';
+      pulseEl.innerHTML=`<div class="gjd-pulse-card ${isClose?'gjd-pulse-close':''}"><b>最新${isClose?'收盘':'盘中'}5分钟脉冲</b> · ${esc(latest.start)}–${esc(latest.end)} · ${esc(latest.label||'—')} · 覆盖 ${latest.coverage?.valid??'—'}/${latest.coverage?.expected??22}只<br>
+        <span class="up">上涨区间超额 ${money(latest.up_excess_yi)}</span> · <span class="down">下跌区间超额 ${money(latest.down_excess_yi)}</span> · 托底候选 ${money(latest.support_excess_yi)}<br>
+        30分钟：上涨 ${money(p30.up_excess_yi)} / 下跌 ${money(p30.down_excess_yi)}；60分钟：上涨 ${money(p60.up_excess_yi)} / 下跌 ${money(p60.down_excess_yi)}<div class="gjd-pulse-note">按区间价格方向推断，不是逐笔 buy/sell 单；真实买卖单需 Level-2/逐笔成交。</div></div>`;
+    }else{
+      pulseEl.innerHTML=`<div class="gjd-pulse-card"><span class="note">${esc(pl.reason||'盘中脉冲待更新；收盘后可看最近完整区间。')}</span></div>`;
+    }
+  }
   document.getElementById('gjd-cycle-events').innerHTML=events.map(e=>`<span class="gjd-event ${esc(e.type||'')}">${day(e.date)} ${esc(e.label||'')}</span>`).join('');
-  document.getElementById('gjd-cycle-stages').innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>阶段</th><th>区间</th><th>份额折算</th><th title="涨跌方向超额成交差额：不是二级净买入">二级代理</th><th>上证</th><th>状态</th></tr></thead><tbody>${stages.map(s=>`<tr class="${s.key==='reentry'?'current':s.key==='distribution'?'distribution':''}"><td>${esc(s.label||'')}</td><td>${day(s.start)} → ${day(s.end)}</td><td class="${cls(s.official_yi)}">${money(s.official_yi)}</td><td class="${cls(s.proxy_yi)}">${money(s.proxy_yi)}</td><td class="${cls(s.index_pct)}">${pct(s.index_pct)}</td><td>${s.complete?'完整':(s.valid_days??'—')+'/'+(s.days??'—')+'日'}</td></tr>`).join('')}</tbody></table></div>
-    <div class="note">份额折算 vs 二级代理不是同一渠道，不能相加；阶段由份额流与固定核心池识别，不是账户身份确认。二级代理 = 上涨日超额成交 − 下跌日超额成交，不是二级净买入。</div>`;
-  document.getElementById('gjd-cycle-months').innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>月份</th><th>份额折算</th><th title="涨跌方向超额成交差额：不是二级净买入">二级代理</th><th>状态</th></tr></thead><tbody>${months.map(m=>`<tr><td>${esc(m.month||'')}</td><td class="${cls(m.official_yi)}">${money(m.official_yi)}</td><td class="${cls(m.proxy_yi)}">${money(m.proxy_yi)}</td><td>${m.complete?'完整':(m.valid_days??0)+'/'+(m.days??0)+'日'}</td></tr>`).join('')}</tbody></table></div>`;
+  document.getElementById('gjd-cycle-stages').innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>阶段</th><th>区间</th><th>份额折算</th><th title="上涨日超额成交−下跌日超额成交，不是二级净买入">二级方向性放量差</th><th>上证</th><th>状态</th></tr></thead><tbody>${stages.map(s=>`<tr class="${s.key==='reentry'?'current':s.key==='distribution'?'distribution':''}"><td>${esc(s.label||'')}</td><td>${day(s.start)} → ${day(s.end)}</td><td class="${cls(s.official_yi)}">${money(s.official_yi)}</td><td class="${cls(s.proxy_yi)}">${money(s.proxy_yi)}</td><td class="${cls(s.index_pct)}">${pct(s.index_pct)}</td><td>${s.complete?'完整':(s.valid_days??'—')+'/'+(s.days??'—')+'日'}</td></tr>`).join('')}</tbody></table></div>
+    <div class="note">份额折算 vs 二级代理不是同一渠道，不能相加；阶段由份额流与固定核心池识别，不是账户身份确认。二级方向性放量差 = 上涨日超额成交 − 下跌日超额成交，是成交方向差，不是二级净买入。</div>`;
+  document.getElementById('gjd-cycle-months').innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>月份</th><th>份额折算</th><th title="上涨日超额成交−下跌日超额成交，不是二级净买入">二级方向性放量差</th><th>状态</th></tr></thead><tbody>${months.map(m=>`<tr><td>${esc(m.month||'')}</td><td class="${cls(m.official_yi)}">${money(m.official_yi)}</td><td class="${cls(m.proxy_yi)}">${money(m.proxy_yi)}</td><td>${m.complete?'完整':(m.valid_days??0)+'/'+(m.days??0)+'日'}</td></tr>`).join('')}</tbody></table></div>`;
   document.getElementById('gjd-cycle-watch').innerHTML=`<b>接下来看什么</b>：${(g.watch||[]).map(esc).join(' · ')}<br><b>历史量级</b>：本轮份额折算相当于924前吸筹的 ${vs.current_vs_pre924!=null?(vs.current_vs_pre924*100).toFixed(1)+'%':'—'}；强度为参照的 ${vs.intensity_ratio!=null?(vs.intensity_ratio*100).toFixed(1)+'%':'—'}。历史比较不是持仓或进度。`;
   document.getElementById('gjd-cycle-method').innerHTML=`<div class="gjd-method"><p><b>${esc(g.method?.answer||'')}</b></p><p>${esc(g.method?.primary||'')}</p><p>${esc(g.method?.secondary||'')}</p><p>${esc(g.method?.identity||'')}</p></div>`;
 }
@@ -1495,7 +1509,7 @@ function renderEtfEvidenceError(message){
   document.getElementById('etfe-summary').textContent='资金数据不可用，暂停判断：'+text;
   document.getElementById('etfe-cards').innerHTML='';
   renderEtfCampaign({periods:{},method_note:'资金数据不可用，暂停两轮判断。'});
-  renderGjdCycle({status:'unavailable',reason:message});
+  renderGjdCycle({status:'unavailable',reason:message},{});
   document.getElementById('etf-pool-compare').innerHTML='';
   ['etf-pulse-asof','etf-ref-asof','etf-investment-asof','etfe-asof','etf-estimate-asof'].forEach(id=>document.getElementById(id).textContent='');
   document.getElementById('etf-pulse-main').innerHTML='<div class="note">资金数据不可用，暂停脉冲判断。</div>';
@@ -1518,7 +1532,7 @@ function renderEtfEvidence(d){
   const card=(k,v,sub,extra='')=>`<div class="card ${extra}"><div class="k">${k}</div><div class="v" style="font-size:17px">${v}</div><div class="sub">${sub||''}</div></div>`;
   const sourceDate=v=>v?fmtDate(v):'—';
   renderEtfCampaign(d.campaign||{});
-  renderGjdCycle(d.gjd_cycle||{});
+  renderGjdCycle(d.gjd_cycle||{},d.pulse||{});
   renderEtfResearch(d);
   document.getElementById('etfe-asof').textContent='成交 '+sourceDate(d.as_of)+' · 申赎 '+sourceDate(f.date);
   document.getElementById('etfe-summary').hidden=!d.error;
