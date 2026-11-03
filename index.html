@@ -663,8 +663,8 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 <div id="module-etf" style="display:none">
 <div class="subtabs" id="nav-sub">
   <button id="tab-m" class="on" onclick="showTab('m')">盘中监控</button>
-  <button id="tab-f" onclick="showTab('f')">申赎日报</button>
-  <button id="tab-h" onclick="showTab('h')">国家队跟踪</button>
+  <button id="tab-f" onclick="showTab('f')">申赎跟踪</button>
+  <button id="tab-h" onclick="showTab('h')">救市退出跟踪</button>
 </div>
 <section id="view-m" class="view on">
   <div class="panel etf-hero" id="panel-etf-intraday-hero"><h3>今日 ETF 二级脉冲 · 代理<span class="refresh-note" id="etf-intraday-asof"></span></h3><div id="etf-intraday-hero"></div></div>
@@ -679,7 +679,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
   <div id="m-brief" class="brief"></div>
   
   <div class="cards" id="m-cards"></div>
-  <div class="panel"><h3>当日最高单只观察分（5分钟）</h3><div class="note" id="mscore-state"></div><div id="ch-mscore" class="chart"></div></div>
+  <div class="panel" style="display:none"><h3>当日最高单只观察分（5分钟）</h3><div class="note" id="mscore-state"></div><div id="ch-mscore" class="chart"></div></div>
   </details>
   <div class="panel" id="panel-etf-pace" style="display:none"><h3>当日成交节奏</h3><div class="note" id="mamt-state"></div><div id="ch-mamt" class="chart"></div><div style="overflow:auto"><table id="mamt-recent"></table></div>
     </div>
@@ -694,7 +694,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 
 <section id="view-f" class="view">
   <div class="datebar"><span>申赎数据日期</span><select id="f-date" onchange="setFlowDate(this.value)"></select><span class="refresh-note" id="f-date-hint">默认最新批次，可回看历史</span></div>
-  <div class="panel etf-hero" id="panel-flow-hero"><h3>每日申赎 · 国家队观察<span class="refresh-note" id="etf-daily-asof"></span></h3><div id="etf-daily-hero"></div></div>
+  <div class="panel etf-hero" id="panel-flow-hero"><h3>申赎跟踪 · 国家队观察<span class="refresh-note" id="etf-daily-asof"></span></h3><div id="etf-daily-hero"></div></div>
   <div id="f-brief" class="brief" style="display:none"></div>
   <div class="cards" id="f-cards" style="display:none"></div>
   
@@ -726,7 +726,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 
 <section id="view-h" class="view">
   <div class="panel gjd-cycle-panel" id="panel-gjd-cycle">
-    <div class="gjd-head"><h3>国家队跟踪 · 2023 至今</h3><span class="refresh-note" id="gjd-cycle-asof"></span></div>
+    <div class="gjd-head"><h3>国家队救市退出跟踪 · 2023 至今</h3><span class="refresh-note" id="gjd-cycle-asof"></span></div>
     <div id="gjd-cycle-hero"></div>
     <div id="gjd-cycle-pulse" class="gjd-pulse"></div>
     <div id="gjd-cycle-events" class="gjd-events"></div>
@@ -1166,7 +1166,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='99352bcf8550';
+const PAGE_VERSION='e422d3e1b0f0';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1400,7 +1400,7 @@ function renderGjdCycle(g,pulse){
       <div class="gjd-kpi current"><span>核心7只份额折算（主口径）</span><b class="${cls(c7cur.official_yi)}">${money(c7cur.official_yi)}</b><small>22只观察池 ${money(p.official_yi)} · 不含非核心宽基/风格</small></div>
       <div class="gjd-kpi sell"><span>二级方向性放量差（代理）</span><b class="${cls(p.proxy_yi)}">${money(p.proxy_yi)}</b><small>上涨日 ${money(p.proxy_buy)} / 下跌日 ${money(p.proxy_sell)} · 差率 ${p.proxy_imbalance_pct!=null?pct(p.proxy_imbalance_pct):'—'} · 不是净买入</small></div>
       <div class="gjd-kpi"><span>同期上证</span><b class="${cls(p.index_pct)}">${pct(p.index_pct)}</b><small>${day(p.start)} → ${day(p.end)} · 当前${p.index_pct<0?'下跌':'上涨'}</small></div>
-      <div class="gjd-kpi"><span>2026-10 份额申购</span><b class="${cls(oct.official_yi)}">${money(oct.official_yi)}</b><small>9月 ${money(sep.official_yi)} · 10月${oct.official_yi>sep.official_yi?'明显加速':'未加速'}</small></div>
+      <div class="gjd-kpi"><span>2026-10 份额申购（22只）</span><b class="${cls(oct.official_yi)}">${money(oct.official_yi)}</b><small>9月 ${money(sep.official_yi)} · 10月${oct.official_yi>sep.official_yi?'明显加速':'未加速'}</small></div>
     </div><div class="gjd-caveat">${esc(g.method?.answer||'ETF份额变化只能作为代理，不能直接等同国家队。')}</div>`;
   const pl=pulse||{}, latest=pl.latest||{}, p30=pl.total_30m||{}, p60=pl.total_60m||{};
   const pulseEl=document.getElementById('gjd-cycle-pulse');
@@ -1550,11 +1550,11 @@ function renderEtfIntradayHero(d){
   const cov=l.coverage||{}, core=ctx.core||{}, all=ctx.all||{};
   const totalAmount=(est.intervals||[]).reduce((sum,x)=>sum+(Number(x.amount_yi)||0),0);
   el.innerHTML=`<div class="gjd-kicker">最新区间 ${esc(l.start)}–${esc(l.end)} · ${esc(l.label||'—')} · 覆盖 ${cov.valid??'—'}/${cov.expected??22} 只</div>
-    <div class="gjd-verdict">${money(l.excess_yi)} 区间正超额，${money(l.up_excess_yi)} 上涨窗 / ${money(l.down_excess_yi)} 下跌窗</div>
+    <div class="gjd-verdict">${money(l.excess_yi)} 正超额毛额，净偏离 ${money(l.net_deviation_yi)}（实际 ${money(l.amount_yi)} − 预期 ${money(l.expected_yi)}）</div>
     <div class="gjd-kpis">
-      <div class="gjd-kpi current"><span>区间正超额</span><b class="${cls(l.excess_yi)}">${money(l.excess_yi)}</b><small>实际成交减预期 · 不是净买入</small></div>
+      <div class="gjd-kpi current"><span>区间正超额（毛额）</span><b class="${cls(l.excess_yi)}">${money(l.excess_yi)}</b><small>上涨窗 ${money(l.up_excess_yi)} + 下跌窗 ${money(l.down_excess_yi)} · 不是净买入</small></div>
       <div class="gjd-kpi"><span>30 / 60 分钟正超额</span><b style="font-size:15px">${money(p.total_30m?.excess_yi)} / ${money(p.total_60m?.excess_yi)}</b><small>30分钟上涨 ${money(p.total_30m?.up_excess_yi)} · 下跌 ${money(p.total_30m?.down_excess_yi)}</small></div>
-      <div class="gjd-kpi sell"><span>今日核心7只总成交</span><b style="font-size:17px">${money(totalAmount)}</b><small>上涨窗超额 ${money(est.estimated_buy_yi)} / 下跌窗 ${money(est.estimated_sell_yi)} · 超额差 ${money(est.estimated_net_yi)}（不是总买入）</small></div>
+      <div class="gjd-kpi sell"><span>今日核心7只总成交</span><b style="font-size:17px">${money(totalAmount)}</b><small>上涨窗超额 ${money(est.estimated_buy_yi)} / 下跌窗 ${money(est.estimated_sell_yi)} · 超额差 ${money(est.estimated_net_yi)}（不是总买入） · 覆盖 ${est.covered_minutes||'—'}/240分钟</small></div>
       <div class="gjd-kpi"><span>核心 / 全池放量</span><b style="font-size:15px">${num(core.ratio)}x / ${num(all.ratio)}x</b><small>核心超额占比 ${num(ctx.core_excess_share,0)}% · 核心覆盖 ${l.core_valid??'—'}/7</small></div>
     </div>
     <div class="etf-hero-note">总成交额不是买入额；超额差=实际成交减历史预期，不是净买入。5分钟/成交额方向推断，不是逐笔大单，也不是账户身份确认。<button class="mini" style="margin-left:8px" onclick="toggleEtfMDetails()">展开日频/结构明细</button></div>`;
@@ -1663,7 +1663,7 @@ async function loadMonitor(){
     let title=legacy?'旧口径快照：等待盘中监控进程加载新评分':
       (s.warming_up?'开盘预热：前30分钟不外推':`${phase}ETF成交与相对表现：最高单只 ${score==null?'—':score.toFixed(0)} 分`);
     let note=legacy?'旧评分包含跨标的拼接与重复成交计分，当前读数不用于判断。':
-      `估算超额成交 <b>${fs1(s.pool_excess_yi)} 亿</b>，主要集中在 ${top||'—'}；这是成交差，不是净买入。`;
+      `估算正超额（毛额） <b>${fs1(s.pool_excess_yi)} 亿</b>，主要集中在 ${top||'—'}；这是22只正超额合计，含买卖两侧，不是净流入/买入额。`;
     if(!legacy)note+=` 核心中位 <b>${benchTxt}</b>，相对抗跌且放量 <b>${k}</b> 只。`;
     if(!legacy&&tail>0)note+=` 尾盘有 <b>${tail}</b> 只放量上涨。`;
     if(!legacy&&s.warming_up)note+=' 前30分钟不计算超额成交、不发提醒。';
@@ -1671,7 +1671,7 @@ async function loadMonitor(){
     const gradeCls=score>=60?' class="hot"':'';
     mBrief.className='brief '+(legacy?'warn':score>=60?'buy':score>=20?'warn':'');
     mBrief.innerHTML=`<h3>${title}</h3>
-      <div class="brief-meta">${legacy?'旧口径观察分':'最高单只观察分'} <b>${score==null?'—':score.toFixed(0)}</b>（<b${gradeCls}>${grade}</b>），估算成交差 <b>${fs1(s.pool_excess_yi)} 亿</b>，核心中位 <b>${benchTxt}</b></div>
+      <div class="brief-meta">${legacy?'旧口径观察分':'最高单只观察分'} <b>${score==null?'—':score.toFixed(0)}</b>（<b${gradeCls}>${grade}</b>），估算正超额（毛额） <b>${fs1(s.pool_excess_yi)} 亿</b>，核心中位 <b>${benchTxt}</b></div>
       <div class="brief-note">${note}</div>`;
   }
   const d=new Date();
@@ -1683,8 +1683,8 @@ async function loadMonitor(){
     <div class="card"><div class="k">${legacy?'旧口径分':'最高单只观察分'}</div><div class="v">${score==null?'—':score.toFixed(0)}
       <span class="badge ${g}" style="vertical-align:middle">${grade}</span>${warm}</div>
       <div class="sub">${asof}</div></div>
-    <div class="card"><div class="k">估算超额成交</div><div class="v ${cls(s.pool_excess_yi)}">${fs1(s.pool_excess_yi)} 亿</div>
-      <div class="sub">成交差，非净流入；尾盘放量上涨 ${s.tail_hits||0} 只</div></div>
+    <div class="card"><div class="k">估算正超额（毛额）</div><div class="v ${cls(s.pool_excess_yi)}">${fs1(s.pool_excess_yi)} 亿</div>
+      <div class="sub">22只正超额合计，非净流入/非买入额；尾盘放量上涨 ${s.tail_hits||0} 只</div></div>
     <div class="card"><div class="k">核心 ETF 中位涨跌</div><div class="v ${cls(s.bench)}">${s.bench==null?'—':(s.bench>0?'+':'')+num(s.bench,2)}%</div>
       <div class="sub">相对抗跌且放量 ${s.k_synergy||0} 只</div></div>
     <div class="card"><div class="k">超额成交最大</div><div class="v" style="font-size:15px">${lead?esc(lead.name)+' ('+lead.code+')':'—'}</div>
@@ -1810,7 +1810,7 @@ async function loadFlow(force,date){
   const deEl=document.getElementById('f-delta');
   const dnum=v=>v==null?'—':(v>0?'+':'')+num(v,1);
   if(deEl){
-    deEl.style.display=(de.d5==null&&de.d20==null&&de.d60==null)?'none':'block';
+    deEl.style.display='none';
     deEl.innerHTML=`较昨日：5 日 <b>${dnum(de.d5)} 亿</b>，20 日 <b>${dnum(de.d20)} 亿</b>，60 日 <b>${dnum(de.d60)} 亿</b>；观察池宽基占比 <b>${dnum(de.broad_share_pp)}pp</b>`;
   }
   const se=f.sensitivity||{};
