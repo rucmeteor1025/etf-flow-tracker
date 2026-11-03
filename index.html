@@ -380,7 +380,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 #breadth-chart-details>summary{font-size:11px;color:var(--muted);cursor:pointer}
 #margin-ranges input{max-width:150px}#margin-ranges label{font-size:12px;color:var(--muted)}
 @media(max-width:640px){#margin-ranges input{max-width:135px}.breadth-card .v{font-size:19px}}
-.gjd-cycle-panel{border-left:4px solid #1c2333}
+.etf-hero{border-left:4px solid #1c2333}.etf-hero h3{margin-bottom:6px}.etf-hero .gjd-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.etf-hero .gjd-verdict{font-size:15px}.etf-hero .etf-hero-note{font-size:11px;color:#6b7280;margin-top:5px}.gjd-cycle-panel{border-left:4px solid #1c2333}
 .gjd-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 .gjd-head h3{margin:0}
 .gjd-kicker{font-size:12px;color:#6b7280;margin:8px 0 4px}
@@ -667,10 +667,11 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
   <button id="tab-h" onclick="showTab('h')">国家队跟踪</button>
 </div>
 <section id="view-m" class="view on">
-  <div class="panel"><h3>ETF 申赎与成交证据<span class="refresh-note" id="etfe-asof"></span></h3><div class="note" id="etfe-summary" hidden></div><div class="cards" id="etfe-cards"></div><div class="etf-pool-head"><span>量能对照</span><span id="etf-pool-basis"></span></div><div id="etf-pool-compare"></div></div>
-  <div class="panel" id="panel-etf-pulse"><h3>最新成交脉冲<span class="refresh-note" id="etf-pulse-asof"></span></h3><div id="etf-pulse-main"></div><div id="etf-pulse-recent"></div><div class="note" id="etf-pulse-note"></div></div>
-  <div class="panel" id="panel-etf-reference"><h3>申购强度与结构轮动<span class="refresh-note" id="etf-ref-asof"></span></h3><div id="etf-ref-main"></div><div id="etf-rotation"></div><details class="res-more"><summary>历史事件参照</summary><div id="etf-ref-events"></div></details><div class="note" id="etf-ref-note"></div></div>
-  <div class="panel" id="panel-investment-state"><h3>投资观察<span class="refresh-note" id="etf-investment-asof"></span></h3><div id="etf-investment-state"></div></div>
+  <div class="panel etf-hero" id="panel-etf-intraday-hero"><h3>今日国家队脉冲<span class="refresh-note" id="etf-intraday-asof"></span></h3><div id="etf-intraday-hero"></div></div>
+  <div class="panel" id="panel-etf-evidence" style="display:none"><h3>ETF 申赎与成交证据<span class="refresh-note" id="etfe-asof"></span></h3><div class="note" id="etfe-summary" hidden></div><div class="cards" id="etfe-cards"></div><div class="etf-pool-head"><span>量能对照</span><span id="etf-pool-basis"></span></div><div id="etf-pool-compare"></div></div>
+  <div class="panel" id="panel-etf-pulse" style="display:none"><h3>最新成交脉冲<span class="refresh-note" id="etf-pulse-asof"></span></h3><div id="etf-pulse-main"></div><div id="etf-pulse-recent"></div><div class="note" id="etf-pulse-note"></div></div>
+  <div class="panel" id="panel-etf-reference" style="display:none"><h3>申购强度与结构轮动<span class="refresh-note" id="etf-ref-asof"></span></h3><div id="etf-ref-main"></div><div id="etf-rotation"></div><details class="res-more"><summary>历史事件参照</summary><div id="etf-ref-events"></div></details><div class="note" id="etf-ref-note"></div></div>
+  <div class="panel" id="panel-investment-state" style="display:none"><h3>投资观察<span class="refresh-note" id="etf-investment-asof"></span></h3><div id="etf-investment-state"></div></div>
   <div class="panel"><h3>今日ETF区间成交估算<span class="refresh-note" id="etf-estimate-asof"></span></h3><div id="etf-estimate-state" class="note"></div><div id="ch-etf-estimate" class="chart" style="height:230px"></div></div>
   <div class="panel"><h3>重点宽基</h3><div id="etf-focus" class="etf-focus-grid"></div></div>
   <div class="panel" id="panel-etf-detail" hidden><div class="etf-detail-head"><h3 id="etf-detail-title"></h3><button class="mini" onclick="closeEtfDetail()">收起</button></div><div class="etf-detail-stats" id="etf-detail-stats"></div><div class="refresh-note" id="etf-detail-date"></div><div id="ch-etf-detail" class="chart" style="height:220px"></div><div id="etf-detail-records" class="note"></div></div>
@@ -680,9 +681,9 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
   <div class="cards" id="m-cards"></div>
   <div class="panel"><h3>当日最高单只观察分（5分钟）</h3><div class="note" id="mscore-state"></div><div id="ch-mscore" class="chart"></div></div>
   </details>
-  <div class="panel"><h3>当日成交节奏</h3><div class="note" id="mamt-state"></div><div id="ch-mamt" class="chart"></div><div style="overflow:auto"><table id="mamt-recent"></table></div>
+  <div class="panel" id="panel-etf-pace" style="display:none"><h3>当日成交节奏</h3><div class="note" id="mamt-state"></div><div id="ch-mamt" class="chart"></div><div style="overflow:auto"><table id="mamt-recent"></table></div>
     </div>
-  <div class="panel"><h3>ETF 明细</h3>
+  <div class="panel" id="panel-etf-list" style="display:none"><h3>ETF 明细</h3>
     <div class="filters" id="m-filters"></div><button class="mini" id="monitor-details" onclick="toggleMonitorDetails()">展开指标分项</button>
     <div style="overflow:auto"><table id="m-table"></table></div>
     </div>
@@ -693,11 +694,12 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 
 <section id="view-f" class="view">
   <div class="datebar"><span>申赎数据日期</span><select id="f-date" onchange="setFlowDate(this.value)"></select><span class="refresh-note" id="f-date-hint">默认最新批次，可回看历史</span></div>
-  <div id="f-brief" class="brief"></div>
-  <div class="cards" id="f-cards"></div>
+  <div class="panel etf-hero" id="panel-flow-hero"><h3>每日申赎 · 国家队观察<span class="refresh-note" id="etf-daily-asof"></span></h3><div id="etf-daily-hero"></div></div>
+  <div id="f-brief" class="brief" style="display:none"></div>
+  <div class="cards" id="f-cards" style="display:none"></div>
   
-  <div class="delta" id="f-delta"></div>
-  <div class="panel"><h3>结构拆分：GJD 观察池 vs 非观察池</h3>
+  <div class="delta" id="f-delta" style="display:none"></div>
+  <div class="panel" id="panel-flow-split" style="display:none"><h3>结构拆分：GJD 观察池 vs 非观察池</h3>
     <div id="ch-fsplit" class="chart" style="height:230px"></div>
     <div id="f-split-table" style="margin-top:6px"></div>
     
@@ -711,12 +713,12 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
     
     <div id="ch-fcum" class="chart" style="height:260px"></div>
     </div>
-  <div class="panel"><h3>净申购 / 净赎回前 20</h3>
+  <div class="panel" id="panel-flow-top20" style="display:none"><h3>净申购 / 净赎回前 20</h3>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div><b style="color:var(--red)">净申购前 20</b><div style="overflow:auto"><table id="f-top-buy"></table></div></div>
       <div><b style="color:var(--green)">净赎回前 20</b><div style="overflow:auto"><table id="f-top-sell"></table></div></div>
     </div></div>
-  <div class="panel"><h3>ETF 观察池 22 只（★=核心）</h3><div style="overflow:auto"><table id="f-gjd"></table></div>
+  <div class="panel" id="panel-flow-pool" style="display:none"><h3>ETF 观察池 22 只（★=核心）</h3><div style="overflow:auto"><table id="f-gjd"></table></div>
     </div>
 
 <details class="panel etf-methods"><summary>数据说明</summary><div class="note" style="margin:-2px 0 10px">宽基/行业/风格为全市场 A 股 ETF 口径；22 只观察池为历史关注名单，不能据此识别申购者。</div><div class="note" id="f-sens"></div><div class="note">拆分是会计口径：非观察池 = 全市场 − 观察池。仅在22只份额差值全部有效时计算池总额；ETF 份额不显示申购者。</div><div class="note">柱=当日净申赎（左轴，宽基深色/行业浅色/风格叠加）；线=上证指数（右轴）。红=净申购，绿=净赎回。</div><div class="note">线=窗口内累计净流入（左轴）与上证指数（右轴）；切换窗口时累计从窗口起点重新计算。</div><div class="note">★ 核心 7 只均为宽基；512880（证券）、510880/515080（红利）为非宽基备选。</div></details>
@@ -1164,7 +1166,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='ebd59937d1e4';
+const PAGE_VERSION='0cd20bbce682';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1518,6 +1520,7 @@ function renderEtfEvidenceError(message){
   document.getElementById('etfe-cards').innerHTML='';
   renderEtfCampaign({periods:{},method_note:'资金数据不可用，暂停两轮判断。'});
   renderGjdCycle({status:'unavailable',reason:message},{});
+  renderEtfIntradayHero({});
   document.getElementById('etf-pool-compare').innerHTML='';
   ['etf-pulse-asof','etf-ref-asof','etf-investment-asof','etfe-asof','etf-estimate-asof'].forEach(id=>document.getElementById(id).textContent='');
   document.getElementById('etf-pulse-main').innerHTML='<div class="note">资金数据不可用，暂停脉冲判断。</div>';
@@ -1534,6 +1537,59 @@ function renderEtfEvidenceError(message){
   document.getElementById('etfe-pending').textContent='';
   if(charts['ch-etf-estimate'])charts['ch-etf-estimate'].clear();
 }
+function renderEtfIntradayHero(d){
+  const el=document.getElementById('etf-intraday-hero'); if(!el)return;
+  const p=d.pulse||{}, l=p.latest||{}, est=d.day_estimate||{}, ctx=d.pool_context||{}, fresh=p.freshness||{};
+  const money=v=>v==null||!isFinite(Number(v))?'—':(Number(v)>0?'+':'')+Number(v).toFixed(1)+' 亿';
+  const num=(v,n=2)=>v==null||!isFinite(Number(v))?'—':Number(v).toFixed(n);
+  const asof=document.getElementById('etf-intraday-asof');
+  if(asof)asof.textContent=(fresh.as_of||d.as_of||'')?('行情 '+(fresh.as_of||d.as_of)):'';
+  if(p.status==='stale'){el.innerHTML='<div class="note">快照陈旧，暂停最新脉冲判断；不以旧行情冒充当前。</div>';return;}
+  if(!l.end){el.innerHTML='<div class="note">'+esc(p.reason||'等待有效盘中区间与历史基准。')+'</div>';return;}
+  const cov=l.coverage||{}, core=ctx.core||{}, all=ctx.all||{};
+  el.innerHTML=`<div class="gjd-kicker">最新区间 ${esc(l.start)}–${esc(l.end)} · ${esc(l.label||'—')} · 覆盖 ${cov.valid??'—'}/${cov.expected??22} 只</div>
+    <div class="gjd-verdict">${money(l.excess_yi)} 区间正超额，${money(l.up_excess_yi)} 上涨窗 / ${money(l.down_excess_yi)} 下跌窗</div>
+    <div class="gjd-kpis">
+      <div class="gjd-kpi current"><span>区间正超额</span><b class="${cls(l.excess_yi)}">${money(l.excess_yi)}</b><small>实际成交减预期 · 不是净买入</small></div>
+      <div class="gjd-kpi"><span>30 / 60 分钟正超额</span><b style="font-size:15px">${money(p.total_30m?.excess_yi)} / ${money(p.total_60m?.excess_yi)}</b><small>30分钟上涨 ${money(p.total_30m?.up_excess_yi)} · 下跌 ${money(p.total_30m?.down_excess_yi)}</small></div>
+      <div class="gjd-kpi sell"><span>今日区间成交估算</span><b class="${cls(est.estimated_net_yi)}">${money(est.estimated_net_yi)}</b><small>上涨窗 ${money(est.estimated_buy_yi)} / 下跌窗 ${money(est.estimated_sell_yi)}</small></div>
+      <div class="gjd-kpi"><span>核心 / 全池放量</span><b style="font-size:15px">${num(core.ratio)}x / ${num(all.ratio)}x</b><small>核心超额占比 ${num(ctx.core_excess_share,0)}% · 核心覆盖 ${l.core_valid??'—'}/7</small></div>
+    </div>
+    <div class="etf-hero-note">5分钟/成交额方向推断，不是逐笔大单，也不是账户身份确认；仅作盘中脉冲观察。<button class="mini" style="margin-left:8px" onclick="toggleEtfMDetails()">展开日频/结构明细</button></div>`;
+}
+function toggleEtfMDetails(){
+  const ids=['panel-etf-evidence','panel-etf-pulse','panel-etf-reference','panel-investment-state','panel-etf-list','panel-etf-pace'];
+  const first=document.getElementById(ids[0]); const show=first&&first.style.display==='none';
+  ids.forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=show?'':'none';});
+  if(show)Object.values(charts).forEach(c=>{try{c.resize()}catch(e){}});
+}
+function renderEtfDailyHero(f){
+  const el=document.getElementById('etf-daily-hero'); if(!el)return;
+  if(!f||f.error){el.innerHTML='<div class="note">'+(f&&f.error?esc(f.error):'申赎数据暂不可用')+'</div>';return;}
+  const s=f.summary||{}, sig=f.signal||{}, se=f.sensitivity||{}, b=s.buckets||{}, st=f.pool_share_status||{};
+  const money=v=>v==null||!isFinite(Number(v))?'—':(Number(v)>0?'+':'')+Number(v).toFixed(1)+' 亿';
+  const pct=v=>v==null?'—':Number(v).toFixed(1)+'%';
+  const gjd=f.gjd_net, five=sig.gjd_5d, core=se.core7, gjd22=se.gjd22;
+  const broad=(b['宽基']||{}).net, ind=(b['行业主题']||{}).net, style=(b['风格红利']||{}).net;
+  const asof=document.getElementById('etf-daily-asof'); if(asof)asof.textContent='完整披露 '+(f.date||'—');
+  const fiveNote=sig.roll5_pct!=null?`${pct(sig.roll5_pct)} 历史分位`:'五日历史不足';
+  el.innerHTML=`<div class="gjd-kicker">${esc(f.date||'—')} · 观察池份额 ${st.valid??'—'}/${st.expected??22} 只有效 · 一级份额代理</div>
+    <div class="gjd-verdict">观察池当日${gjd>0?'净申购':'净赎回'} ${money(gjd)}；近5日 ${money(five)}（${fiveNote}）</div>
+    <div class="gjd-kpis">
+      <div class="gjd-kpi current"><span>观察池当日净申赎</span><b class="${cls(gjd)}">${money(gjd)}</b><small>22只 · 份额差×收盘价</small></div>
+      <div class="gjd-kpi"><span>近5日观察池</span><b class="${cls(five)}">${money(five)}</b><small>${fiveNote} · 日频累计</small></div>
+      <div class="gjd-kpi"><span>核心7只当日</span><b class="${cls(core)}">${money(core)}</b><small>核心宽基 · 高信号子集</small></div>
+      <div class="gjd-kpi"><span>22只观察池当日</span><b class="${cls(gjd22)}">${money(gjd22)}</b><small>含非核心宽基/风格</small></div>
+    </div>
+    <div class="gjd-caveat">当日结构：宽基 ${money(broad)} · 行业主题 ${money(ind)} · 风格红利 ${money(style)}。份额变动含所有持有人，不是国家队身份；不含二级交易。</div>
+    <div class="etf-hero-note"><button class="mini" onclick="toggleFlowDetails()">展开结构/TOP20/观察池明细</button><button class="mini" style="margin-left:6px" onclick="showTab('h')">查看本轮累计 →</button></div>`;
+}
+function toggleFlowDetails(){
+  const ids=['panel-flow-split','panel-flow-top20','panel-flow-pool'];
+  const first=document.getElementById(ids[0]); const show=first&&first.style.display==='none';
+  ids.forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=show?'':'none';});
+  if(show)Object.values(charts).forEach(c=>{try{c.resize()}catch(e){}});
+}
 function renderEtfEvidence(d){
   if(d.error){renderEtfEvidenceError(d.error);return;}
   const f=d.flow||{}, inf=d.inference||{}, h=d.history||{}, coverage=f.coverage||{}, estimate=d.day_estimate||{};
@@ -1541,6 +1597,7 @@ function renderEtfEvidence(d){
   const sourceDate=v=>v?fmtDate(v):'—';
   renderEtfCampaign(d.campaign||{});
   renderGjdCycle(d.gjd_cycle||{},d.pulse||{});
+  renderEtfIntradayHero(d);
   renderEtfResearch(d);
   document.getElementById('etfe-asof').textContent='成交 '+sourceDate(d.as_of)+' · 申赎 '+sourceDate(f.date);
   document.getElementById('etfe-summary').hidden=!d.error;
@@ -1673,7 +1730,7 @@ async function loadFlow(force,date){
   }
   if(seq!==FLOW_SEQ)return false;
   if(!f)return false;
-  if(f.error){document.getElementById('f-date-hint').textContent=f.error;return false;}
+  if(f.error){document.getElementById('f-date-hint').textContent=f.error;renderEtfDailyHero({error:f.error});return false;}
   const fSel=document.getElementById('f-date');
   if(fSel&&f.dates){
     fSel.innerHTML=f.dates.map(x=>`<option value="${x}">${fmtDate(x)}</option>`).join('');
@@ -1683,6 +1740,7 @@ async function loadFlow(force,date){
   setPageDate('fund:f',f.date,'申赎数据');
   saveView();
   const s=f.summary||{};
+  renderEtfDailyHero(f);
   const b=s.buckets||{};
   const bk=k=>b[k]||{net:null,count:0};
   const sig=f.signal||{};
