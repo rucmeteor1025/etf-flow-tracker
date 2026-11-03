@@ -1163,7 +1163,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='bbf1448875ea';
+const PAGE_VERSION='c2335e065742';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1405,7 +1405,7 @@ function renderGjdCycle(g,pulse){
   }
   document.getElementById('gjd-cycle-events').innerHTML=events.map(e=>`<span class="gjd-event ${esc(e.type||'')}">${day(e.date)} ${esc(e.label||'')}</span>`).join('');
   document.getElementById('gjd-cycle-stages').innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>阶段</th><th>区间</th><th>份额折算</th><th title="上涨日超额成交−下跌日超额成交，不是二级净买入">二级方向性放量差</th><th>上证</th><th>状态</th></tr></thead><tbody>${stages.map(s=>`<tr class="${s.key==='reentry'?'current':s.key==='distribution'?'distribution':''}"><td>${esc(s.label||'')}</td><td>${day(s.start)} → ${day(s.end)}</td><td class="${cls(s.official_yi)}">${money(s.official_yi)}</td><td class="${cls(s.proxy_yi)}">${money(s.proxy_yi)}</td><td class="${cls(s.index_pct)}">${pct(s.index_pct)}</td><td>${s.complete?'完整':(s.valid_days??'—')+'/'+(s.days??'—')+'日'}</td></tr>`).join('')}</tbody></table></div>
-    <div class="note">份额折算 vs 二级代理不是同一渠道，不能相加；阶段由份额流与固定核心池识别，不是账户身份确认。二级方向性放量差 = 上涨日超额成交 − 下跌日超额成交，是成交方向差，不是二级净买入。</div>`;
+    <div class="note">份额折算 vs 二级方向性放量差不是同一渠道，不能相加；阶段由份额流与固定核心池识别，不是账户身份确认。二级方向性放量差 = 上涨日超额成交 − 下跌日超额成交，是成交方向差，不是二级净买入。</div>`;
   document.getElementById('gjd-cycle-months').innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>月份</th><th>份额折算</th><th title="上涨日超额成交−下跌日超额成交，不是二级净买入">二级方向性放量差</th><th>状态</th></tr></thead><tbody>${months.map(m=>`<tr><td>${esc(m.month||'')}</td><td class="${cls(m.official_yi)}">${money(m.official_yi)}</td><td class="${cls(m.proxy_yi)}">${money(m.proxy_yi)}</td><td>${m.complete?'完整':(m.valid_days??0)+'/'+(m.days??0)+'日'}</td></tr>`).join('')}</tbody></table></div>`;
   document.getElementById('gjd-cycle-watch').innerHTML=`<b>接下来看什么</b>：${(g.watch||[]).map(esc).join(' · ')}<br><b>历史量级</b>：本轮份额折算相当于924前吸筹的 ${vs.current_vs_pre924!=null?(vs.current_vs_pre924*100).toFixed(1)+'%':'—'}；强度为参照的 ${vs.intensity_ratio!=null?(vs.intensity_ratio*100).toFixed(1)+'%':'—'}。历史比较不是持仓或进度。`;
   document.getElementById('gjd-cycle-method').innerHTML=`<div class="gjd-method"><p><b>${esc(g.method?.answer||'')}</b></p><p>${esc(g.method?.primary||'')}</p><p>${esc(g.method?.secondary||'')}</p><p>${esc(g.method?.identity||'')}</p></div>`;
