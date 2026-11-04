@@ -484,8 +484,14 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 .emotion-hero{border-left:4px solid #607c9f}.emotion-hero.repair{border-left-color:#b86b3c}.emotion-hero.good{border-left-color:#c74d4d}.emotion-hero.unknown{border-left-color:#9aa4b8}.emotion-kicker{font-size:11px;color:#7e8a99;margin-bottom:8px}.emotion-grid{display:grid;grid-template-columns:minmax(190px,.75fr) minmax(280px,1.35fr) minmax(240px,1fr);gap:22px}.emotion-grid h3{margin:0 0 7px;font-size:13px}.emotion-state{font-size:28px;font-weight:700;line-height:1.35}.emotion-transition{font-size:11px;color:#7a8796;margin-top:5px}.emotion-points{margin:4px 0 0;padding-left:17px;font-size:12px;line-height:1.75;color:#4b5b6d}.emotion-confirm{font-size:12px;line-height:1.8}.emotion-confirm b{font-size:17px;color:#2c425b}.emotion-metrics{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;padding-top:10px;border-top:1px solid #edf0f4}.emotion-metric{font-size:11px;color:#8793a1}.emotion-metric b{display:block;color:#35465c;font-size:16px}.emotion-section-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}.emotion-section-title span{font-size:11px;color:#8490a0}.emotion-theme-signal{display:inline-block;padding:1px 6px;border-radius:4px;background:#edf2f7;color:#52677f;font-size:10px}.emotion-reason{font-size:11px;color:#8b7b69;line-height:1.7;margin-top:8px}.emotion-timeline-state{font-weight:650}.emotion-overlay-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.emotion-overlay-grid ul{margin:4px 0;padding-left:18px;font-size:12px;line-height:1.75}@media(max-width:900px){.emotion-grid{grid-template-columns:1fr}.emotion-metrics{gap:12px}.emotion-overlay-grid{grid-template-columns:1fr}}@media(max-width:640px){.emotion-state{font-size:24px}#emotion-timeline{min-width:800px}#emotion-themes{min-width:560px}}
 /* 选股1号：逻辑卡、得分明细与回顾收益面板（名单下方） */
 .sel-logic-title{margin:0 0 8px;font-size:13.5px}
-#selection-one-panel{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:#fafbfc;margin:0 0 14px}
-.sel-context{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px}
+#selection-one-panel{border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:#fafbfc;margin:0 0 14px}
+.sel-rule-bar{padding:0 0 10px;margin:0 0 10px;border-bottom:1px solid #e6ebf1}
+.sel-rule-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px;font-size:13px}
+.sel-rule-head span{font-size:11.5px;color:#2c6fb0;font-weight:600}
+.sel-rule-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;font-size:12px;line-height:1.65;color:#394357}
+.sel-rule-grid>div{background:#fff;border:1px solid #e6ebf1;border-radius:6px;padding:8px 10px}
+.sel-rule-grid small{display:block;color:#64748b;font-size:11px;font-weight:600;margin-bottom:3px}
+.sel-context{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px}
 .sel-context small{display:block;color:var(--muted);font-size:10.5px}
 .sel-rationale{margin:8px 0 0;font-size:12.5px;line-height:1.75;color:#333}
 .sel-candidates{margin-top:8px;font-size:12px}
@@ -510,9 +516,18 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 .sel-score{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
 .sel-factor{display:inline-block;font-size:10px;background:#eef1f5;color:#394357;border-radius:3px;padding:0 4px;line-height:1.7}
 .sel-score b{margin-left:4px;font-size:12.5px}
-.sel-reason ul{margin:6px 0 0;padding-left:16px;font-size:11.5px;line-height:1.75}
-.sel-reason ul li b{color:#4a5568}
-@media(max-width:900px){.sel-hero-grid{grid-template-columns:1fr}.sel-review-stats{gap:10px}}
+.sel-reason{max-width:460px}
+.sel-reason summary{line-height:1.6;color:#1e293b}
+.sel-reason-head{color:#334155;font-size:12px}
+.sel-reason-grid{margin-top:6px;padding:7px 9px;background:#f8fafc;border:1px solid #e6ebf1;border-radius:6px;display:grid;gap:5px;font-size:12px;line-height:1.65}
+.sel-reason-row{display:grid;grid-template-columns:36px 1fr;gap:6px;align-items:baseline}
+.sel-reason-row b{color:#475569;font-size:11.5px}
+.sel-settle{min-width:170px;line-height:1.5}
+.sel-settle-pair{display:flex;gap:12px;flex-wrap:wrap;align-items:baseline}
+.sel-settle-pair>span{display:inline-flex;flex-direction:column;min-width:72px}
+.sel-settle-pair small{font-size:10.5px;color:#64748b}
+.sel-settle-pair b{font-size:13px;font-variant-numeric:tabular-nums}
+@media(max-width:900px){.sel-hero-grid,.sel-rule-grid{grid-template-columns:1fr}.sel-review-stats{gap:10px}}
 
 .theme-ladder-table{overflow-x:auto}.theme-ladder-table table{min-width:760px;width:100%}.theme-ladder-table th,.theme-ladder-table td{white-space:normal;text-align:left;vertical-align:top}.theme-ladder-table td:first-child{min-width:90px}.theme-ladder-table td:nth-child(4){min-width:320px;width:55%}.theme-market-ladder{margin:10px 0;padding:10px 12px;background:#f5f7fa;border-radius:6px;font-size:13px;line-height:1.8}.theme-ladder-level{display:grid;grid-template-columns:80px minmax(0,1fr);gap:8px;padding:5px 0;border-bottom:1px solid #f0f2f5;line-height:1.8}.theme-ladder-level b{font-size:12px;white-space:nowrap}.theme-ladder-level .code-link{font-size:12px}.theme-ladder-level.empty{color:#98a1ad;font-size:12px}#theme-ladder-status{margin:7px 0;line-height:1.8}
 
@@ -1174,7 +1189,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='ac73ffd1aa38';
+const PAGE_VERSION='8f8189880ded';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -4639,7 +4654,7 @@ async function viewInvestmentReport(path){
 }
 function speculationPlanHtml(row){
   const o=row.outcome||{},entry=row.entry||{},abandon=row.abandon||{},expiry=row.expiry||{},ctx=row.decision_context||{};
-  return `<div class="workflow-plan"><p><small>参与条件</small> ${selectionText(entry.condition||entry.text||'原清单未提供')}</p><p><small>放弃条件</small> ${esc((abandon.rules||[]).join('；')||'原清单未提供')}</p><p><small>到期约束</small> ${esc(({'T2_CLOSE':'T2收盘（原策略到期日）'})[expiry.text]||expiry.text||'原清单未提供到期约束')}${expiry.definition?'<div class="note">'+esc(expiry.definition)+'</div>':''}</p><div class="workflow-result"><b>${esc(o.label||'结果未取得')}</b>${o.return_pct!=null?' · '+esc(o.return_label):''}${o.entry_date?'<div>模拟入场 '+esc(o.entry_date)+(o.entry_price!=null?' · '+esc(String(o.entry_price)):'')+'</div>':''}${o.exit_date?'<div>模拟退出 '+esc(o.exit_date)+'</div>':''}<div class="note">${(o.notes||[]).map(esc).join('；')}</div></div>${ctx.logic||ctx.risk?`<details><summary>候选依据与风险</summary>${ctx.logic?'<p>'+esc(ctx.logic)+'</p>':''}${ctx.risk?'<p>'+esc(ctx.risk)+'</p>':''}</details>`:''}</div>`;
+  return `<div class="workflow-plan"><p><small>执行条件</small> ${selectionText(entry.text||entry.condition||'原清单未提供')}</p><p><small>放弃条件</small> ${esc((abandon.rules||[]).join('；')||'原清单未提供')}</p><p><small>卖出规则</small> ${esc(({'T2_CLOSE':'T+1日收盘卖出'})[expiry.text]||expiry.text||'原清单未提供到期约束')}${expiry.definition?'<div class="note">'+esc(expiry.definition)+'</div>':''}</p><div class="workflow-result"><b>${esc(o.label||'结果未取得')}</b>${o.return_pct!=null?' · '+esc(o.return_label):''}${o.entry_date?'<div>模拟入场 '+esc(o.entry_date)+(o.entry_price!=null?' · '+esc(String(o.entry_price)):'')+'</div>':''}${o.exit_date?'<div>模拟退出 '+esc(o.exit_date)+'</div>':''}<div class="note">${(o.notes||[]).map(esc).join('；')}</div></div>${ctx.logic||ctx.risk?`<details><summary>候选依据与风险</summary>${ctx.logic?'<p>'+esc(_cleanSelText(ctx.logic))+'</p>':''}${ctx.risk?'<p>'+esc(_cleanSelText(ctx.risk))+'</p>':''}</details>`:''}</div>`;
 }
 function selectionOutcomeCell(row){
   const rows=(SELECTION_DATA?.workflow?.rows||[]).filter(x=>x.code===row.code&&(row.rank==null||x.rank===row.rank));
@@ -4907,15 +4922,40 @@ function selectionOneFactorChips(row){
   const chips=labels.map(([full,short])=>`<span class="sel-factor" title="${full} ${fs[full]!=null?selectionNumber(fs[full],1):'—'}/2">${short}${fs[full]!=null?selectionNumber(fs[full],0):'·'}</span>`).join('');
   return `<div class="sel-score">${chips}<b>总 ${selectionNumber(row.score,1)}/12</b></div>`;
 }
+function _cleanSelText(s){
+  if(!s)return '';
+  return String(s)
+    .replace(/T0复盘/g,'前日复盘').replace(/\bT0\b/g,'前日')
+    .replace(/\btech\s*(\d)/gi,'技术$1分')
+    .replace(/[（(][^）)]*(?:pending_verification|仅作旁证|引擎校验|不作\d分依据)[^）)]*[）)]/g,'')
+    .replace(/[；;，,]?\s*(?:固定折价本身不是选优理由|逻辑失效不自动撤单|不能指望断势自然不成交|位置偏高标签提示追高自判|按题材扩散交易)/g,'')
+    .trim();
+}
 function selectionOneReason(row){
-  const bits=[['定位',row.position],['执行理由',row.action_reason],['逻辑',row.logic],['催化',row.catalyst],['风险',row.risk]]
-    .filter(([,v])=>v).map(([k,v])=>`<li><b>${k}</b> ${esc(String(v))}</li>`);
-  if(row.entry_price!=null)bits.push(`<li><b>限价</b> ${selectionNumber(row.entry_price,2)}</li>`);
-  if(row.entry_condition)bits.push(`<li><b>触发条件</b> ${esc(String(row.entry_condition))}</li>`);
-  if(!bits.length)return '—';
-  return `<details class="sel-reason"><summary>理由与得分依据</summary><ul>${bits.join('')}</ul></details>`;
+  const logic=_cleanSelText(row.logic),cat=_cleanSelText(row.catalyst),risk=_cleanSelText(row.risk);
+  const pos=row.position?`<span class="selection-tag">${esc(row.position)}</span> `:'';
+  const headSrc=cat||logic||risk;
+  const head=headSrc?headSrc.split(/[；。]/)[0]:'查看依据';
+  const shortHead=head.length>32?head.slice(0,32)+'…':head;
+  const items=[['逻辑',logic],['催化',cat],['风险',risk]].filter(([,v])=>v);
+  if(!items.length)return pos||'—';
+  return `<details class="sel-reason"><summary>${pos}<span class="sel-reason-head">${esc(shortHead)}</span></summary><div class="sel-reason-grid">${items.map(([k,v])=>`<div class="sel-reason-row"><b>${k}</b><span>${esc(v)}</span></div>`).join('')}</div></details>`;
 }
 function _selRetPct(v){return typeof v==='number'&&Number.isFinite(v)?(v>0?'+':'')+v.toFixed(2)+'%':'—';}
+function selectionOneSettlementCell(row){
+  const s=row.settlement||{};
+  const st=s.state||'pending';
+  if(st==='watch_only')return `<div class="sel-settle"><span class="note">仅观察（不交易）</span></div>`;
+  if(st==='not_filled')return `<div class="sel-settle"><span class="note">未触价（不交易）</span>${s.note?`<div class="sub-line">${esc(s.note)}</div>`:''}</div>`;
+  if(st==='unbuyable')return `<div class="sel-settle"><span class="note">涨停买不进</span>${s.note?`<div class="sub-line">${esc(s.note)}</div>`:''}</div>`;
+  const t1=s.t1_return_pct!=null?`<b class="${cls(s.t1_return_pct)}">${_selRetPct(s.t1_return_pct)}</b>`:'<span class="note">待收盘</span>';
+  const t2=s.t2_return_pct!=null?`<b class="${cls(s.t2_return_pct)}">${_selRetPct(s.t2_return_pct)}</b>`:`<span class="note">${st==='t1_done'?'待T+1收盘':'待结算'}</span>`;
+  const px=[];
+  if(s.entry_price_actual!=null)px.push('买 '+Number(s.entry_price_actual).toFixed(2));
+  if(s.t1_close!=null)px.push('T收 '+Number(s.t1_close).toFixed(2));
+  if(s.t2_close!=null)px.push('T+1收 '+Number(s.t2_close).toFixed(2));
+  return `<div class="sel-settle"><div class="sel-settle-pair"><span><small>T日浮盈</small>${t1}</span><span><small>T+1收盘卖出</small>${t2}</span></div>${px.length?`<div class="sub-line">${px.join(' → ')}</div>`:''}</div>`;
+}
 function selectionNavChart(review){
   const hostId='ch-sel-nav';
   if(charts[hostId]){charts[hostId].dispose();delete charts[hostId];}
@@ -4952,10 +4992,18 @@ function renderSelectionOnePanel(d){
   if(SELECTION_TAB!=='1'||!d||d.status!=='ready'){host.hidden=true;host.innerHTML='';return;}
   const ctx=d.context||{};
   const contextBits=[['市场状态',ctx.market_state],['最强方向',ctx.strongest_theme],['次强方向',ctx.second_theme],['最该打层级',ctx.target_layer]]
-    .filter(([,v])=>v).map(([k,v])=>`<span><small>${k}</small> ${esc(String(v))}</span>`).join('');
-  const rationale=ctx.rationale?`<p class="sel-rationale">${esc(String(ctx.rationale))}</p>`:'';
-  const candidates=Array.isArray(ctx.candidates)&&ctx.candidates.length?`<details class="sel-candidates"><summary>落选候选池 ${ctx.candidates.length}只（同批对比）</summary><div class="sel-cand-list">${ctx.candidates.map(x=>`<span>${esc(x.name||x.code||'—')}<small>${selectionNumber(x.score,1)}</small></span>`).join('')}</div></details>`:'';
-  host.innerHTML=`<h4 class="sel-logic-title">选股1号 · 当日选股逻辑</h4><div class="sel-context">${contextBits||'<span class="note">当日记录未含方向判断</span>'}</div>${rationale}${candidates}`;
+    .filter(([,v])=>v).map(([k,v])=>`<span><small>${k}</small> <b>${esc(String(v))}</b></span>`).join('');
+  const rationale=ctx.rationale?`<p class="sel-rationale">${esc(_cleanSelText(ctx.rationale))}</p>`:'';
+  const candidates=Array.isArray(ctx.candidates)&&ctx.candidates.length?`<details class="sel-candidates"><summary>同批落选候选池 ${ctx.candidates.length}只（对照）</summary><div class="sel-cand-list">${ctx.candidates.map(x=>`<span>${esc(x.name||x.code||'—')}<small>${selectionNumber(x.score,1)}</small></span>`).join('')}</div></details>`:'';
+  const ruleBox=`<div class="sel-rule-bar">
+    <div class="sel-rule-head"><b>选股1号 · 选股逻辑与交易规则</b><span>固定 T 日买入 → T+1 日收盘卖出（持仓 1 个隔夜）</span></div>
+    <div class="sel-rule-grid">
+      <div><small>选股逻辑（主线 × 六因子 12 分制）</small>盘前（08:25）结合前一日复盘锁定<b>最强方向 × 最该打层级</b>（龙头/中军/高弹性/防守），按环境、方向、层级、事件、热度、技术各 0–2 分择优产出 3 只标的。</div>
+      <div><small>买入规则（T 日入场 · 三槽位分工）</small><b>第 1、2 只</b>（MA20 乖离 ≤ 8%）T 日开盘集合竞价买入（开盘一字板买不进放弃）；<b>第 3 只</b>（高乖离核心）挂前收 × 0.97（-3%）限价低吸，未触价不交易。</div>
+      <div><small>卖出与结算（T 日浮盈 + T+1 收盘卖出）</small>凡 T 日成交均持有至 <b>T+1 日收盘卖出</b>。结算分两项：<b>T日浮盈</b>（T日收盘/买入价−1）看当日承接，<b>T+1收盘卖出收益率</b>（T+1收盘/买入价−1）为正式结算收益。</div>
+    </div>
+  </div>`;
+  host.innerHTML=`${ruleBox}<div class="sel-day-box"><h4 class="sel-logic-title">当日选股判断（${esc(fmtDate(d.date||''))}）</h4><div class="sel-context">${contextBits||'<span class="note">当日记录未含方向判断</span>'}</div>${rationale}${candidates}</div>`;
   host.hidden=false;
 }
 function renderSelectionReview(d){
@@ -5029,11 +5077,10 @@ function renderSelection(){
     const vr=row=>selectionNumber(row.volume_ratio,2,'倍'),pct=row=>`<span class="${cls(row.pct_chg)}">${selectionNumber(row.pct_chg,2,'%')}</span>`;
     const condition=row=>`<div class="selection-condition">${selectionText(row.entry)}${row.bid_state&&SELECTION_TAB==='4'?`<div class="sub-line">${selectionText(row.bid_state)}</div>`:''}</div>`;
     let columns;
-    if(SELECTION_TAB==='1')columns=[['排序',(r,i)=>i+1],['股票',selectionStock],['方向',r=>selectionText(r.theme)],['得分',selectionOneFactorChips],['执行条件',condition],['理由',selectionOneReason]];
-    else if(SELECTION_TAB==='2')columns=[['股票',selectionStock],['形态',tag],['涨幅',pct],['量比',vr],['条件',condition]];
-    else if(SELECTION_TAB==='3')columns=[['股票',selectionStock],['战法',tag],['方向',r=>selectionText(r.theme)],['涨幅',pct],['板位',r=>selectionText(r.board)],['执行条件',condition]];
+    if(SELECTION_TAB==='1')columns=[['排序',(r,i)=>i+1],['股票',selectionStock],['方向',r=>selectionText(r.theme)],['得分',selectionOneFactorChips],['执行条件',condition],['理由',selectionOneReason],['结算',selectionOneSettlementCell]];
+    else if(SELECTION_TAB==='2')columns=[['股票',selectionStock],['形态',tag],['涨幅',pct],['量比',vr],['条件',condition],['结算',selectionOutcomeCell]];
+    else if(SELECTION_TAB==='3')columns=[['股票',selectionStock],['战法',tag],['方向',r=>selectionText(r.theme)],['涨幅',pct],['板位',r=>selectionText(r.board)],['执行条件',condition],['结算',selectionOutcomeCell]];
     else columns=[['股票',selectionStock],['板块',r=>selectionText(r.industry)],['题材',selectionThemes],['信号',tag],['成交额',r=>selectionAmount(r.amount)],['涨幅',pct],['量比',vr],['三日各量比',r=>Array.isArray(r.volume_ratios_3d)&&r.volume_ratios_3d.length?r.volume_ratios_3d.map(v=>selectionNumber(v,2,'倍')).join(' / '):'—'],['底部位置',r=>selectionNumber(r.price_position,2,'%')],['首红',r=>r.macd_hist==null?'—':`<span class="up">首根红柱</span><div class="sub-line">${selectionNumber(r.macd_hist,4)}</div>`]];
-    if(SELECTION_TAB!=='4')columns.push(['规则与事后结果',selectionOutcomeCell]);
     document.getElementById('selection-count').textContent=rows.length+'只股票';
     const groups=selectionGroups(rows,source);
     results.innerHTML=rows.length?`<div class="selection-table"><table><thead><tr>${columns.map(selectionHeader).join('')}</tr></thead><tbody>${groups.map(g=>(g.label?`<tr class="selection-group"><td colspan="${columns.length}">${esc(g.label)}<small>${g.rows.length}只</small></td></tr>`:'')+g.rows.map((r,i)=>`<tr>${columns.map(c=>`<td>${c[1](r,i)}</td>`).join('')}</tr>`).join('')).join('')}</tbody></table></div>`:`<div class="selection-state">${esc(d.message||'没有符合当前筛选的股票')}</div>`;
