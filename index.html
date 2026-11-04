@@ -1189,7 +1189,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='8f8189880ded';
+const PAGE_VERSION='74eb893e95ea';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -4998,9 +4998,9 @@ function renderSelectionOnePanel(d){
   const ruleBox=`<div class="sel-rule-bar">
     <div class="sel-rule-head"><b>选股1号 · 选股逻辑与交易规则</b><span>固定 T 日买入 → T+1 日收盘卖出（持仓 1 个隔夜）</span></div>
     <div class="sel-rule-grid">
-      <div><small>选股逻辑（主线 × 六因子 12 分制）</small>盘前（08:25）结合前一日复盘锁定<b>最强方向 × 最该打层级</b>（龙头/中军/高弹性/防守），按环境、方向、层级、事件、热度、技术各 0–2 分择优产出 3 只标的。</div>
-      <div><small>买入规则（T 日入场 · 三槽位分工）</small><b>第 1、2 只</b>（MA20 乖离 ≤ 8%）T 日开盘集合竞价买入（开盘一字板买不进放弃）；<b>第 3 只</b>（高乖离核心）挂前收 × 0.97（-3%）限价低吸，未触价不交易。</div>
-      <div><small>卖出与结算（T 日浮盈 + T+1 收盘卖出）</small>凡 T 日成交均持有至 <b>T+1 日收盘卖出</b>。结算分两项：<b>T日浮盈</b>（T日收盘/买入价−1）看当日承接，<b>T+1收盘卖出收益率</b>（T+1收盘/买入价−1）为正式结算收益。</div>
+      <div><small>1. 选股逻辑</small>每日盘前结合前一日复盘主线与多维评分模型，从主线方向中择优精选 3 只标的。</div>
+      <div><small>2. 买入规则（T 日入场）</small><b>第 1、2 只</b>按 T 日开盘集合竞价买入（开盘一字板买不进则放弃）；<b>第 3 只</b>按盘前给定限价单低吸，T 日触价即成交、未触价不交易。</div>
+      <div><small>3. 卖出与结算（T 日浮盈 + T+1 收盘卖出）</small>凡 T 日成交均固定持有至 <b>T+1 日收盘卖出</b>。结算分两项：<b>T日浮盈</b>（T日收盘/买入价−1）看当日承接，<b>T+1收盘卖出收益率</b>（T+1收盘/买入价−1）为正式结算收益。</div>
     </div>
   </div>`;
   host.innerHTML=`${ruleBox}<div class="sel-day-box"><h4 class="sel-logic-title">当日选股判断（${esc(fmtDate(d.date||''))}）</h4><div class="sel-context">${contextBits||'<span class="note">当日记录未含方向判断</span>'}</div>${rationale}${candidates}</div>`;
