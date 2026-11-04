@@ -734,6 +734,8 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
     <div id="gjd-cycle-events" class="gjd-events"></div>
     <div class="gjd-block gjd-narr"><h4>全周期复盘 · 叙事锚点 + 当时新闻 <span class="refresh-note" id="gjd-narr-asof"></span></h4><div id="gjd-narr-stages"></div></div>
     <div class="gjd-block gjd-narr"><h4>退出按月拆解</h4><div id="gjd-narr-exit"></div></div>
+    <div class="gjd-block gjd-narr"><h4>汇金真实持仓校准 · ETF定期报告前十名持有人</h4><div id="gjd-narr-anchor"></div></div>
+    <div class="gjd-block gjd-narr"><h4>二级信号 · 最近10个交易日（核心7只）<span class="refresh-note" id="gjd-sec-asof"></span></h4><div id="gjd-narr-sec"></div></div>
     <div class="gjd-grid">
       <div class="gjd-block"><h4>规则自动分段（对照）</h4><div id="gjd-cycle-stages"></div></div>
       <div class="gjd-block"><h4>本轮月度节奏</h4><div id="gjd-cycle-months"></div></div>
@@ -1170,7 +1172,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='94249290a3fb';
+const PAGE_VERSION='bf62c6ad469f';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1386,7 +1388,7 @@ function renderGjdCycle(g,pulse){
   if(!g||g.status!=='ready'){
     if(asof)asof.textContent='';
     hero.innerHTML='<div class="note">'+esc((g&&g.reason)||'周期数据暂不可用')+'</div>';
-    ['gjd-cycle-pulse','gjd-cycle-events','gjd-cycle-stages','gjd-cycle-months','gjd-cycle-watch','gjd-cycle-method','gjd-narr-stages','gjd-narr-exit'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
+    ['gjd-cycle-pulse','gjd-cycle-events','gjd-cycle-stages','gjd-cycle-months','gjd-cycle-watch','gjd-cycle-method','gjd-narr-stages','gjd-narr-exit','gjd-narr-anchor','gjd-narr-sec'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
     return;
   }
   const p=g.current||{}, months=p.months||[], stages=g.stages||[], events=g.events||[];
@@ -1441,15 +1443,21 @@ function renderGjdNarrative(n){
   const evEl=document.getElementById('gjd-cycle-events');
   if(evEl){const evs=[];(n.stages||[]).forEach(s=>(s.news||[]).forEach(x=>{if(x.confidence==='official')evs.push({date:x.date,text:x.text,type:s.expect==='out'?'distribution':s.key==='reentry'?'reentry':s.expect==='in'?'accelerate':''});}));
     evEl.innerHTML=evs.map(e=>`<span class="gjd-event ${esc(e.type)}" title="${esc(e.text)}">${day(e.date)} ${esc(e.text.length>18?e.text.slice(0,18)+'…':e.text)}</span>`).join('');}
+  const secCells=x=>{if(!x)return '<td>—</td><td>—</td>';const lab=x.dominant?`<b>${esc(x.dominant_label)}</b>`:`<span style="color:#9aa3ae">${esc(x.dominant_label||'—')}</span>`;return `<td class="${cls(x.prem_mean_bp)}" title="高分位${x.high_days}天 / 低分位${x.low_days}天">${x.prem_mean_bp==null?'—':(x.prem_mean_bp>0?'+':'')+x.prem_mean_bp.toFixed(1)} / ${x.prem_pct_mean??'—'}</td><td title="z=${x.z??'—'}；尾盘托底${x.tail_support_days}天、尾盘巨量${x.tail_heavy_days}天">${lab}${x.z!=null?' <small>z '+x.z+'</small>':''}${x.tail_support_days?' <small>尾托'+x.tail_support_days+'</small>':''}</td>`;};
+  const an=n.anchors||{}, ae=document.getElementById('gjd-narr-anchor');
+  if(ae){ae.innerHTML=an.status!=='ready'?'<div class="note">'+esc(an.reason||'未录入汇金持仓锚点')+'</div>':`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>报告期</th><th>覆盖ETF</th><th>汇金持有（亿份）</th><th>持有市值</th><th>占这些ETF总份额</th><th>较上期持仓变化</th><th>同期份额净申赎</th><th title="汇金持仓变化÷同批代码份额净申赎">汇金占比</th></tr></thead><tbody>${(an.rows||[]).map(r=>`<tr><td>${day(r.report_date)}</td><td>${r.n_codes}只</td><td>${r.huijin_shares_yi??'—'}</td><td>${money(r.huijin_value_yi)}</td><td>${r.share_of_total_pct!=null?r.share_of_total_pct+'%':'—'}</td><td class="${cls(r.delta_value_yi)}">${money(r.delta_value_yi)}</td><td class="${cls(r.proxy_flow_yi)}">${money(r.proxy_flow_yi)}</td><td>${r.huijin_share_of_flow_pct!=null?r.huijin_share_of_flow_pct+'%':'—'}</td></tr>`).join('')}${(an.upper_bounds||[]).map(b=>`<tr><td>${day(b.report_date)}</td><td>${esc(b.code)}</td><td colspan="6" style="text-align:left;white-space:normal">≤ ${b.max_shares_yi} 亿份（上限）：${esc(b.note)}</td></tr>`).join('')}</tbody></table></div><div class="note">${esc(an.note||'')}</div>`;}
+  const se=document.getElementById('gjd-narr-sec'), sa=document.getElementById('gjd-sec-asof'), rec=n.secondary_recent||[];
+  if(sa)sa.textContent=n.secondary_as_of?'截至 '+day(n.secondary_as_of):'';
+  if(se){se.innerHTML=!rec.length?'<div class="note">二级数据未就绪（etf_gjd_secondary.parquet）。</div>':`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>日期</th><th>二级定性</th><th>溢价 bp</th><th>分位</th><th>尾盘量比</th><th>前段 / 尾盘涨跌</th><th>上证</th><th>核心7份额</th></tr></thead><tbody>${rec.slice().reverse().map(r=>`<tr><td>${day(r.date)}</td><td>${r.cls==='neutral'?'<span style="color:#9aa3ae">中性</span>':'<b>'+esc(r.label)+'</b>'}${r.expiry?' <small>交割日</small>':''}</td><td class="${cls(r.premium_bp)}">${r.premium_bp??'—'}</td><td>${r.prem_pct??'—'}</td><td>${r.tail_ratio!=null?r.tail_ratio.toFixed(2)+'x':'—'}</td><td>${pct(r.pre_ret)} / ${pct(r.tail_ret)}</td><td class="${cls(r.idx_ret)}">${pct(r.idx_ret)}</td><td class="${cls(r.core_flow)}">${r.core_flow==null?'待披露':money(r.core_flow)}</td></tr>`).join('')}</tbody></table></div><div class="note">溢价+申购=二级买盘传导申购；折价+申购=一级直接申购（二级反有抛压）；折价+赎回=二级卖压传导赎回。方向线索，不是账户买卖。</div>`;}
   const rows=(n.stages||[]).filter(s=>s.status==='ready').map(s=>{
     const v=s.verdict||{}, cls2=s.expect==='out'?'exit':s.key==='reentry'?'reentry':'';
     const vtxt=esc(v.label||'—')+(v.matches===false?' <span class="mismatch" title="份额方向与叙事预期不一致">⚠ 与叙事有出入</span>':'');
     const news=(s.news||[]).map(x=>`<span class="gjd-news"><span class="gjd-conf ${esc(x.confidence)}">${esc(labels[x.confidence]||x.confidence)}</span>${day(x.date)} ${esc(x.text)}</span>`).join('');
-    return `<tr class="narr-main ${cls2}"><td class="lbl">${esc(s.label)}</td><td>${day(s.start)} → ${s.pending?day(s.end)+'（进行中）':day(s.end)}</td><td class="${cls(s.broad19_yi)}">${money(s.broad19_yi)}</td><td class="${cls(s.core7_yi)}">${money(s.core7_yi)}</td><td class="${cls(s.pool22_yi)}">${money(s.pool22_yi)}</td><td class="${cls(s.cum_broad19_yi)}">${money(s.cum_broad19_yi)}</td><td class="${cls(s.index_pct)}">${pct(s.index_pct)}</td><td class="down" title="段内高点 ${s.index_high??'—'}（${day(s.index_high_date)}）">${pct(s.index_max_dd_pct)}</td><td class="${cls(s.proxy_yi)}" title="上涨日超额−下跌日超额，22池，不是净买入">${money(s.proxy_yi)}${s.proxy_imbalance_pct!=null?' <small>('+pct(s.proxy_imbalance_pct)+')</small>':''}</td><td>${vtxt}</td><td>${s.complete?'完整':(s.valid_days+'/'+s.days+'日')}</td></tr>
-      <tr class="narr-detail"><td colspan="11"><b>定性</b>：${esc(s.thesis||'')}${news?'<br>'+news:''}</td></tr>`;}).join('');
-  st.innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>阶段</th><th>区间</th><th>全宽基19</th><th>核心7</th><th>22只</th><th>19只累计</th><th>上证</th><th>段内最大回撤</th><th title="上涨日超额−下跌日超额，不是净买入">二级方向差</th><th>份额定性</th><th>完整度</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">${esc(n.basis||'')} ${esc(n.method||'')}</div>`;
+    return `<tr class="narr-main ${cls2}"><td class="lbl">${esc(s.label)}</td><td>${day(s.start)} → ${s.pending?day(s.end)+'（进行中）':day(s.end)}</td><td class="${cls(s.broad19_yi)}">${money(s.broad19_yi)}</td><td class="${cls(s.core7_yi)}">${money(s.core7_yi)}</td><td class="${cls(s.pool22_yi)}">${money(s.pool22_yi)}</td><td class="${cls(s.cum_broad19_yi)}">${money(s.cum_broad19_yi)}</td><td class="${cls(s.index_pct)}">${pct(s.index_pct)}</td><td class="down" title="段内高点 ${s.index_high??'—'}（${day(s.index_high_date)}）">${pct(s.index_max_dd_pct)}</td>${secCells(s.secondary)}<td>${vtxt}</td><td>${s.complete?'完整':(s.valid_days+'/'+s.days+'日')}</td></tr>
+      <tr class="narr-detail"><td colspan="12"><b>定性</b>：${esc(s.thesis||'')}${news?'<br>'+news:''}</td></tr>`;}).join('');
+  st.innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>阶段</th><th>区间</th><th>全宽基19</th><th>核心7</th><th>22只</th><th>19只累计</th><th>上证</th><th>段内最大回撤</th><th title="核心7只收盘/净值−1，成交额加权；分位取此前250日">溢价 bp / 分位</th><th title="高分位天数−低分位天数的显著性（|z|≥2才定性）；尾盘托底=尾盘放量且拉回">二级定性</th><th>份额定性</th><th>完整度</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">${esc(n.basis||'')} ${esc(n.method||'')}</div>`;
   const ms=n.exit_monthly||[];
-  ex.innerHTML=ms.length?`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>月份</th><th>区间</th><th>全宽基19</th><th>核心7</th><th>22只</th><th>上证当月</th><th>完整度</th></tr></thead><tbody>${ms.map(m=>`<tr><td>${esc(m.month)}</td><td>${day(m.start)} → ${day(m.end)}</td><td class="${cls(m.broad19_yi)}">${money(m.broad19_yi)}</td><td class="${cls(m.core7_yi)}">${money(m.core7_yi)}</td><td class="${cls(m.pool22_yi)}">${money(m.pool22_yi)}</td><td class="${cls(m.index_pct)}">${pct(m.index_pct)}</td><td>${m.complete?'完整':'有缺日'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="note">暂无退出段数据。</div>';
+  ex.innerHTML=ms.length?`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>月份</th><th>区间</th><th>全宽基19</th><th>核心7</th><th>22只</th><th>上证当月</th><th>溢价 bp / 分位</th><th>二级定性</th><th>完整度</th></tr></thead><tbody>${ms.map(m=>`<tr><td>${esc(m.month)}</td><td>${day(m.start)} → ${day(m.end)}</td><td class="${cls(m.broad19_yi)}">${money(m.broad19_yi)}</td><td class="${cls(m.core7_yi)}">${money(m.core7_yi)}</td><td class="${cls(m.pool22_yi)}">${money(m.pool22_yi)}</td><td class="${cls(m.index_pct)}">${pct(m.index_pct)}</td>${secCells(m.secondary)}<td>${m.complete?'完整':'有缺日'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="note">暂无退出段数据。</div>';
 }
 function renderEtfCampaign(campaign){
   const periods=campaign.periods||{},current=periods.current||{};
