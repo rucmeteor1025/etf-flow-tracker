@@ -393,6 +393,8 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 .gjd-events{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0}
 .gjd-event{font-size:10px;border-radius:10px;padding:3px 8px;background:#f1f3f6;color:#4b5563}.gjd-event.accelerate{background:#fde8e8;color:#b42318}.gjd-event.distribution{background:#fff1e0;color:#ad5a00}.gjd-event.reentry{background:#e8f5ec;color:#1e7a3c}
 .gjd-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;margin-top:8px}.gjd-block{min-width:0}.gjd-block h4{margin:0 0 5px;font-size:12px;color:#4c5d72}
+.gjd-narr{margin-top:10px}.gjd-narr .gjd-table td.lbl{font-weight:600}.gjd-narr tr.narr-detail td{white-space:normal;text-align:left;font-size:10.5px;color:#5b6573;background:#fafbfc;padding:3px 7px 7px;line-height:1.55}.gjd-narr tr.narr-main.exit td{background:#fffaf3}.gjd-narr tr.narr-main.reentry td{background:#f3faf5}.gjd-narr .mismatch{color:#b45309;font-weight:600}
+.gjd-news{display:inline-block;margin:1px 10px 1px 0}.gjd-conf{font-size:9.5px;padding:0 4px;border-radius:6px;margin-right:3px;background:#eef1f5;color:#4b5563}.gjd-conf.official{background:#e6efff;color:#1d4ed8}.gjd-conf.media{background:#fff4e0;color:#a15c00}.gjd-conf.data{background:#ecf7ef;color:#1e7a3c}.gjd-conf.user{background:#f3e8ff;color:#7e22ce}
 .gjd-table{width:100%;border-collapse:collapse;font-size:11.5px}.gjd-table th,.gjd-table td{padding:6px 7px;border-bottom:1px solid #e6ebf1;text-align:right;white-space:nowrap}.gjd-table th:first-child,.gjd-table td:first-child,.gjd-table th:nth-child(2),.gjd-table td:nth-child(2){text-align:left}.gjd-table th{background:#f4f7fa;color:#4c5d72;font-size:10.5px}.gjd-table tr.current td{background:#fff8f7;font-weight:600}.gjd-table tr.distribution td{background:#fffaf3}
 .gjd-caveat{margin-top:7px;padding:6px 9px;background:#f7f9fc;border:1px solid #e1e6ed;border-radius:6px;font-size:11px;color:#536276;line-height:1.55}.gjd-watch{margin-top:10px;padding:8px 11px;border-left:3px solid #607c9f;background:#f8fafc;font-size:11.5px;line-height:1.75;color:#43526a}.gjd-watch b{color:#1c2333}
 .gjd-method{font-size:11.5px;line-height:1.75;color:#4b5563}.gjd-method b{color:#1c2333}
@@ -730,8 +732,10 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
     <div id="gjd-cycle-hero"></div>
     <div id="gjd-cycle-pulse" class="gjd-pulse"></div>
     <div id="gjd-cycle-events" class="gjd-events"></div>
+    <div class="gjd-block gjd-narr"><h4>全周期复盘 · 叙事锚点 + 当时新闻 <span class="refresh-note" id="gjd-narr-asof"></span></h4><div id="gjd-narr-stages"></div></div>
+    <div class="gjd-block gjd-narr"><h4>退出按月拆解</h4><div id="gjd-narr-exit"></div></div>
     <div class="gjd-grid">
-      <div class="gjd-block"><h4>五阶段复盘</h4><div id="gjd-cycle-stages"></div></div>
+      <div class="gjd-block"><h4>规则自动分段（对照）</h4><div id="gjd-cycle-stages"></div></div>
       <div class="gjd-block"><h4>本轮月度节奏</h4><div id="gjd-cycle-months"></div></div>
     </div>
     <div id="gjd-cycle-watch" class="gjd-watch"></div>
@@ -1166,7 +1170,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='75956c7fcb1e';
+const PAGE_VERSION='e2dff0329ed2';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1382,7 +1386,7 @@ function renderGjdCycle(g,pulse){
   if(!g||g.status!=='ready'){
     if(asof)asof.textContent='';
     hero.innerHTML='<div class="note">'+esc((g&&g.reason)||'周期数据暂不可用')+'</div>';
-    ['gjd-cycle-pulse','gjd-cycle-events','gjd-cycle-stages','gjd-cycle-months','gjd-cycle-watch','gjd-cycle-method'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
+    ['gjd-cycle-pulse','gjd-cycle-events','gjd-cycle-stages','gjd-cycle-months','gjd-cycle-watch','gjd-cycle-method','gjd-narr-stages','gjd-narr-exit'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
     return;
   }
   const p=g.current||{}, months=p.months||[], stages=g.stages||[], events=g.events||[];
@@ -1421,6 +1425,31 @@ function renderGjdCycle(g,pulse){
   document.getElementById('gjd-cycle-months').innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>月份</th><th>22只份额折算</th><th title="上涨日超额成交−下跌日超额成交，不是二级净买入">二级方向性放量差</th><th>状态</th></tr></thead><tbody>${months.map(m=>`<tr><td>${esc(m.month||'')}</td><td class="${cls(m.official_yi)}">${money(m.official_yi)}</td><td class="${cls(m.proxy_yi)}">${money(m.proxy_yi)}</td><td>${m.complete?'完整':(m.valid_days??0)+'/'+(m.days??0)+'日'}</td></tr>`).join('')}</tbody></table></div>`;
   document.getElementById('gjd-cycle-watch').innerHTML=`<b>接下来看什么</b>：${(g.watch||[]).map(esc).join(' · ')}<br><b>历史量级</b>：全宽基19本轮为924前的 ${b19.current_ratio!=null?(b19.current_ratio*100).toFixed(1)+'%':'—'}（核心7 ${c7.current_ratio!=null?(c7.current_ratio*100).toFixed(1)+'%':'—'} · 22池 ${vs.current_vs_pre924!=null?(vs.current_vs_pre924*100).toFixed(1)+'%':'—'}）；强度为参照的 ${vs.intensity_ratio!=null?(vs.intensity_ratio*100).toFixed(1)+'%':'—'}。历史比较不是持仓或进度。`;
   document.getElementById('gjd-cycle-method').innerHTML=`<div class="gjd-method"><p><b>${esc(g.method?.answer||'')}</b></p><p>${esc(g.method?.primary||'')}</p><p>${esc(g.method?.secondary||'')}</p><p>${esc(g.method?.identity||'')}</p></div>`;
+  renderGjdNarrative(g.narrative||{});
+}
+function renderGjdNarrative(n){
+  const st=document.getElementById('gjd-narr-stages'), ex=document.getElementById('gjd-narr-exit');
+  if(!st||!ex)return;
+  const asof=document.getElementById('gjd-narr-asof');
+  if(!n||n.status!=='ready'){st.innerHTML='<div class="note">'+esc((n&&n.reason)||'全周期对账暂不可用')+'</div>';ex.innerHTML='';if(asof)asof.textContent='';return;}
+  const money=v=>v==null?'—':(Number(v)>0?'+':'')+Number(v).toFixed(0)+' 亿';
+  const pct=v=>v==null?'—':(Number(v)>0?'+':'')+Number(v).toFixed(1)+'%';
+  const day=v=>v?fmtDate(v):'—';
+  const labels=n.confidence_labels||{};
+  if(asof)asof.textContent='份额截至 '+day(n.as_of)+' · 主口径全宽基19只';
+  // 事件带改用叙事锚点：官方事件优先，其余只放阶段起点
+  const evEl=document.getElementById('gjd-cycle-events');
+  if(evEl){const evs=[];(n.stages||[]).forEach(s=>(s.news||[]).forEach(x=>{if(x.confidence==='official')evs.push({date:x.date,text:x.text,type:s.expect==='out'?'distribution':s.key==='reentry'?'reentry':s.expect==='in'?'accelerate':''});}));
+    evEl.innerHTML=evs.map(e=>`<span class="gjd-event ${esc(e.type)}" title="${esc(e.text)}">${day(e.date)} ${esc(e.text.length>18?e.text.slice(0,18)+'…':e.text)}</span>`).join('');}
+  const rows=(n.stages||[]).filter(s=>s.status==='ready').map(s=>{
+    const v=s.verdict||{}, cls2=s.expect==='out'?'exit':s.key==='reentry'?'reentry':'';
+    const vtxt=esc(v.label||'—')+(v.matches===false?' <span class="mismatch" title="份额方向与叙事预期不一致">⚠ 与叙事有出入</span>':'');
+    const news=(s.news||[]).map(x=>`<span class="gjd-news"><span class="gjd-conf ${esc(x.confidence)}">${esc(labels[x.confidence]||x.confidence)}</span>${day(x.date)} ${esc(x.text)}</span>`).join('');
+    return `<tr class="narr-main ${cls2}"><td class="lbl">${esc(s.label)}</td><td>${day(s.start)} → ${s.pending?day(s.end)+'（进行中）':day(s.end)}</td><td class="${cls(s.broad19_yi)}">${money(s.broad19_yi)}</td><td class="${cls(s.core7_yi)}">${money(s.core7_yi)}</td><td class="${cls(s.pool22_yi)}">${money(s.pool22_yi)}</td><td class="${cls(s.cum_broad19_yi)}">${money(s.cum_broad19_yi)}</td><td class="${cls(s.index_pct)}">${pct(s.index_pct)}</td><td class="down" title="段内高点 ${s.index_high??'—'}（${day(s.index_high_date)}）">${pct(s.index_max_dd_pct)}</td><td class="${cls(s.proxy_yi)}" title="上涨日超额−下跌日超额，22池，不是净买入">${money(s.proxy_yi)}${s.proxy_imbalance_pct!=null?' <small>('+pct(s.proxy_imbalance_pct)+')</small>':''}</td><td>${vtxt}</td><td>${s.complete?'完整':(s.valid_days+'/'+s.days+'日')}</td></tr>
+      <tr class="narr-detail"><td colspan="11"><b>定性</b>：${esc(s.thesis||'')}${news?'<br>'+news:''}</td></tr>`;}).join('');
+  st.innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>阶段</th><th>区间</th><th>全宽基19</th><th>核心7</th><th>22只</th><th>19只累计</th><th>上证</th><th>段内最大回撤</th><th title="上涨日超额−下跌日超额，不是净买入">二级方向差</th><th>份额定性</th><th>完整度</th></tr></thead><tbody>${rows}</tbody></table></div><div class="note">${esc(n.basis||'')} ${esc(n.method||'')}</div>`;
+  const ms=n.exit_monthly||[];
+  ex.innerHTML=ms.length?`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>月份</th><th>区间</th><th>全宽基19</th><th>核心7</th><th>22只</th><th>上证当月</th><th>完整度</th></tr></thead><tbody>${ms.map(m=>`<tr><td>${esc(m.month)}</td><td>${day(m.start)} → ${day(m.end)}</td><td class="${cls(m.broad19_yi)}">${money(m.broad19_yi)}</td><td class="${cls(m.core7_yi)}">${money(m.core7_yi)}</td><td class="${cls(m.pool22_yi)}">${money(m.pool22_yi)}</td><td class="${cls(m.index_pct)}">${pct(m.index_pct)}</td><td>${m.complete?'完整':'有缺日'}</td></tr>`).join('')}</tbody></table></div>`:'<div class="note">暂无退出段数据。</div>';
 }
 function renderEtfCampaign(campaign){
   const periods=campaign.periods||{},current=periods.current||{};
