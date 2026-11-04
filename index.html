@@ -393,7 +393,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 .gjd-events{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0}
 .gjd-event{font-size:10px;border-radius:10px;padding:3px 8px;background:#f1f3f6;color:#4b5563}.gjd-event.accelerate{background:#fde8e8;color:#b42318}.gjd-event.distribution{background:#fff1e0;color:#ad5a00}.gjd-event.reentry{background:#e8f5ec;color:#1e7a3c}
 .gjd-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;margin-top:8px}.gjd-block{min-width:0}.gjd-block h4{margin:0 0 5px;font-size:12px;color:#4c5d72}
-.gjd-narr{margin-top:10px}.gjd-narr .gjd-table td.lbl{font-weight:600}.gjd-narr tr.narr-detail td{white-space:normal;text-align:left;font-size:10.5px;color:#5b6573;background:#fafbfc;padding:3px 7px 7px;line-height:1.55}.gjd-narr tr.narr-main.exit td{background:#fffaf3}.gjd-narr tr.narr-main.reentry td{background:#f3faf5}.gjd-narr .mismatch{color:#b45309;font-weight:600}
+.gjd-refresh{margin-left:auto;display:flex;gap:8px;align-items:center}.gjd-level-sum{display:flex;flex-wrap:wrap;gap:18px;font-size:12px;margin:4px 0}.gjd-level-sum b{font-size:16px}.gjd-narr{margin-top:10px}.gjd-narr .gjd-table td.lbl{font-weight:600}.gjd-narr tr.narr-detail td{white-space:normal;text-align:left;font-size:10.5px;color:#5b6573;background:#fafbfc;padding:3px 7px 7px;line-height:1.55}.gjd-narr tr.narr-main.exit td{background:#fffaf3}.gjd-narr tr.narr-main.reentry td{background:#f3faf5}.gjd-narr .mismatch{color:#b45309;font-weight:600}
 .gjd-news{display:inline-block;margin:1px 10px 1px 0}.gjd-conf{font-size:9.5px;padding:0 4px;border-radius:6px;margin-right:3px;background:#eef1f5;color:#4b5563}.gjd-conf.official{background:#e6efff;color:#1d4ed8}.gjd-conf.media{background:#fff4e0;color:#a15c00}.gjd-conf.data{background:#ecf7ef;color:#1e7a3c}.gjd-conf.user{background:#f3e8ff;color:#7e22ce}
 .gjd-table{width:100%;border-collapse:collapse;font-size:11.5px}.gjd-table th,.gjd-table td{padding:6px 7px;border-bottom:1px solid #e6ebf1;text-align:right;white-space:nowrap}.gjd-table th:first-child,.gjd-table td:first-child,.gjd-table th:nth-child(2),.gjd-table td:nth-child(2){text-align:left}.gjd-table th{background:#f4f7fa;color:#4c5d72;font-size:10.5px}.gjd-table tr.current td{background:#fff8f7;font-weight:600}.gjd-table tr.distribution td{background:#fffaf3}
 .gjd-caveat{margin-top:7px;padding:6px 9px;background:#f7f9fc;border:1px solid #e1e6ed;border-radius:6px;font-size:11px;color:#536276;line-height:1.55}.gjd-watch{margin-top:10px;padding:8px 11px;border-left:3px solid #607c9f;background:#f8fafc;font-size:11.5px;line-height:1.75;color:#43526a}.gjd-watch b{color:#1c2333}
@@ -728,8 +728,10 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
 
 <section id="view-h" class="view">
   <div class="panel gjd-cycle-panel" id="panel-gjd-cycle">
-    <div class="gjd-head"><h3>国家队救市退出跟踪 · 2023 至今</h3><span class="refresh-note" id="gjd-cycle-asof"></span></div>
+    <div class="gjd-head"><h3>国家队救市退出跟踪 · 2023 至今</h3><span class="refresh-note" id="gjd-cycle-asof"></span><span class="gjd-refresh"><span class="refresh-note" id="gjd-fresh"></span><button class="mini" id="gjd-refresh-btn" onclick="refreshGjdData()">更新数据</button></span></div>
+    <div class="note" id="gjd-refresh-note" style="margin:2px 0 6px"></div>
     <div id="gjd-cycle-hero"></div>
+    <div class="gjd-block gjd-narr gjd-level"><h4>国家队持仓水位 · 汇金真实持仓 + 份额外推</h4><div id="gjd-level-summary"></div><div id="ch-gjd-level" class="chart" style="height:300px"></div><div id="gjd-level-checks"></div></div>
     <div id="gjd-cycle-pulse" class="gjd-pulse"></div>
     <div id="gjd-cycle-events" class="gjd-events"></div>
     <div class="gjd-block gjd-narr"><h4>全周期复盘 · 叙事锚点 + 当时新闻 <span class="refresh-note" id="gjd-narr-asof"></span></h4><div id="gjd-narr-stages"></div></div>
@@ -1172,7 +1174,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='bf62c6ad469f';
+const PAGE_VERSION='eb5dc253de1e';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1388,7 +1390,7 @@ function renderGjdCycle(g,pulse){
   if(!g||g.status!=='ready'){
     if(asof)asof.textContent='';
     hero.innerHTML='<div class="note">'+esc((g&&g.reason)||'周期数据暂不可用')+'</div>';
-    ['gjd-cycle-pulse','gjd-cycle-events','gjd-cycle-stages','gjd-cycle-months','gjd-cycle-watch','gjd-cycle-method','gjd-narr-stages','gjd-narr-exit','gjd-narr-anchor','gjd-narr-sec'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
+    ['gjd-cycle-pulse','gjd-cycle-events','gjd-cycle-stages','gjd-cycle-months','gjd-cycle-watch','gjd-cycle-method','gjd-narr-stages','gjd-narr-exit','gjd-narr-anchor','gjd-narr-sec','gjd-level-summary','gjd-level-checks'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='';});
     return;
   }
   const p=g.current||{}, months=p.months||[], stages=g.stages||[], events=g.events||[];
@@ -1428,6 +1430,51 @@ function renderGjdCycle(g,pulse){
   document.getElementById('gjd-cycle-watch').innerHTML=`<b>接下来看什么</b>：${(g.watch||[]).map(esc).join(' · ')}<br><b>历史量级</b>：全宽基19本轮为924前的 ${b19.current_ratio!=null?(b19.current_ratio*100).toFixed(1)+'%':'—'}（核心7 ${c7.current_ratio!=null?(c7.current_ratio*100).toFixed(1)+'%':'—'} · 22池 ${vs.current_vs_pre924!=null?(vs.current_vs_pre924*100).toFixed(1)+'%':'—'}）；强度为参照的 ${vs.intensity_ratio!=null?(vs.intensity_ratio*100).toFixed(1)+'%':'—'}。历史比较不是持仓或进度。`;
   document.getElementById('gjd-cycle-method').innerHTML=`<div class="gjd-method"><p><b>${esc(g.method?.answer||'')}</b></p><p>${esc(g.method?.primary||'')}</p><p>${esc(g.method?.secondary||'')}</p><p>${esc(g.method?.identity||'')}</p></div>`;
   renderGjdNarrative(g.narrative||{});
+  renderGjdLevel((g.narrative||{}).huijin_level||{});
+  loadGjdFreshness();
+}
+
+let GJD_REFRESHING=false;
+function gjdFreshText(f){if(!f)return '';const d=v=>v?fmtDate(v):'—';return `份额 ${d(f.flow)} · 溢价 ${d(f.premium)} · 尾盘 ${d(f.minutes)} · 汇金报告期 ${d(f.holdings)}`;}
+async function loadGjdFreshness(){if(STATIC)return;try{const j=await jget('/api/etf-gjd/refresh?_='+Date.now());const el=document.getElementById('gjd-fresh');if(el)el.textContent=gjdFreshText(j.freshness);
+  const f=j.freshness||{},note=document.getElementById('gjd-refresh-note');
+  if(note&&!GJD_REFRESHING){const lag=f.flow&&f.premium&&f.premium<f.flow;note.textContent=lag?'二级数据落后于份额数据，可点“更新数据”补齐。':(j.status==='running'?j.message:'');}}catch(e){}}
+async function refreshGjdData(){
+  if(GJD_REFRESHING)return;
+  const note=document.getElementById('gjd-refresh-note'),btn=document.getElementById('gjd-refresh-btn');
+  if(STATIC){note.textContent='请在本地看板更新数据';return;}
+  GJD_REFRESHING=true;btn.disabled=true;btn.textContent='更新中…';note.textContent='正在更新ETF份额与二级数据（约1–3分钟）…';
+  try{
+    const r=await fetch('/api/etf-gjd/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    let job=await r.json();if(!r.ok)throw Error(job.message||'更新未启动');
+    for(let i=0;job.status==='running'&&i<240;i++){note.textContent=job.message||'更新中…';await new Promise(res=>setTimeout(res,3000));job=await jget('/api/etf-gjd/refresh?_='+Date.now());}
+    document.getElementById('gjd-fresh').textContent=gjdFreshText(job.freshness);
+    await loadEtfEvidence();
+    note.textContent=job.message||'更新状态暂不可用';
+  }catch(e){note.textContent='更新未完成：'+String(e.message||e)+'；保留已有数据';}
+  finally{GJD_REFRESHING=false;btn.disabled=false;btn.textContent='更新数据';}
+}
+function renderGjdLevel(h){
+  const sum=document.getElementById('gjd-level-summary'),ck=document.getElementById('gjd-level-checks'),el=document.getElementById('ch-gjd-level');
+  if(!sum)return;
+  if(!h||h.status!=='ready'){sum.innerHTML='<div class="note">'+esc((h&&h.reason)||'持仓水位暂不可用')+'</div>';ck.innerHTML='';el.style.display='none';return;}
+  const s=h.series||[],L=h.latest||{},A=h.anchor_start||{};
+  const money=v=>v==null?'—':Number(v).toFixed(0)+' 亿';
+  const peak=s.reduce((m,x)=>x.est_value_yi>(m.est_value_yi||0)?x:m,{});
+  const chg=A.est_value_yi?((L.est_value_yi/A.est_value_yi-1)*100):null;
+  sum.innerHTML=`<div class="gjd-level-sum"><div>汇金估算持仓（${fmtDate(L.date)}）<br><b>${money(L.est_value_yi)}</b> <small>${L.est_shares_yi??'—'} 亿份 · 占这些ETF ${L.share_pct??'—'}%</small></div><div>最近真值（${fmtDate(L.anchor)}）<br><b>${money(A.est_value_yi)}</b> <small>${A.est_shares_yi??'—'} 亿份</small></div><div>较最近真值<br><b class="${cls(chg)}">${chg==null?'—':(chg>0?'+':'')+chg.toFixed(0)+'%'}</b></div><div>估算峰值<br><b>${money(peak.est_value_yi)}</b> <small>${fmtDate(peak.date)}</small></div><div>历史外推误差<br><b>${h.recent_error_pct!=null?'±'+h.recent_error_pct+'%':'—'}</b> <small>近两期</small></div></div>`;
+  const c=s.length?chart('ch-gjd-level'):null;el.style.display=c?'':'none';
+  if(c){const segs={};s.forEach(x=>{(segs[x.anchor]=segs[x.anchor]||[]).push([x.date,x.est_value_yi]);});
+    const anchors=[...new Set(s.map(x=>x.anchor))].map(a=>{const p=s.find(x=>x.anchor===a&&x.date>=a);return p?[p.date,p.est_value_yi]:null;}).filter(Boolean);
+    const dates=[...new Set(s.map(x=>x.date))].sort();
+    c.setOption({animation:false,tooltip:{trigger:'axis',confine:true,valueFormatter:v=>v==null?'—':Number(v).toFixed(0)+' 亿'},legend:{top:0,textStyle:{fontSize:11}},grid:{left:60,right:20,top:30,bottom:50},
+      xAxis:{type:'category',data:dates,axisLabel:{formatter:v=>v.slice(2,4)+'/'+v.slice(4,6),hideOverlap:true}},yAxis:{type:'value',name:'持仓市值（亿）'},
+      dataZoom:[{type:'inside'},{type:'slider',height:16,bottom:4}],
+      series:[...Object.entries(segs).map(([a,pts],i)=>({name:i===0?'份额外推估算':'估算·'+a,type:'line',showSymbol:false,data:pts,lineStyle:{width:1.8,color:'#3c78b5'},itemStyle:{color:'#3c78b5'},legendHoverLink:false})),
+        {name:'定期报告真值',type:'scatter',data:anchors,symbolSize:9,itemStyle:{color:'#c74d4d'},z:5}]},true);
+    c.setOption({legend:{data:['份额外推估算','定期报告真值']}});c.resize();}
+  const chk=h.checks||[],bc=h.bound_checks||[];
+  ck.innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>外推回测</th><th>区间</th><th>外推值（亿份）</th><th>下期真值</th><th>误差</th></tr></thead><tbody>${chk.map(x=>`<tr><td>${x.codes}只</td><td>${fmtDate(x.from)} → ${fmtDate(x.to)}</td><td>${x.pred_shares_yi}</td><td>${x.actual_shares_yi}</td><td class="${Math.abs(x.error_pct)>20?'down':''}">${x.error_pct>0?'+':''}${x.error_pct}%</td></tr>`).join('')}${bc.map(b=>`<tr><td>${esc(b.code)}</td><td>${fmtDate(b.date)} 上限核对</td><td>${b.est_shares_yi}</td><td>≤ ${b.max_shares_yi}</td><td>${b.consistent?'一致':'<span class="down">超出上限</span>'}</td></tr>`).join('')}</tbody></table></div><div class="note">${esc(h.note||'')} 汇金不是份额主力时（如2023年）外推会严重高估；再进场阶段新增份额不一定都是汇金，估算偏上限。</div>`;
 }
 function renderGjdNarrative(n){
   const st=document.getElementById('gjd-narr-stages'), ex=document.getElementById('gjd-narr-exit');
