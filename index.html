@@ -736,7 +736,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid #44
     <div id="gjd-cycle-events" class="gjd-events"></div>
     <div class="gjd-block gjd-narr"><h4>全周期复盘 · 叙事锚点 + 当时新闻 <span class="refresh-note" id="gjd-narr-asof"></span></h4><div id="gjd-narr-stages"></div></div>
     <div class="gjd-block gjd-narr"><h4>退出按月拆解</h4><div id="gjd-narr-exit"></div></div>
-    <div class="gjd-block gjd-narr"><h4>汇金真实持仓校准 · ETF定期报告前十名持有人</h4><div id="gjd-narr-anchor"></div></div>
+    <div class="gjd-block gjd-narr"><div class="gjd-head" style="margin-bottom:4px"><h4>汇金真实持仓校准 · ETF定期报告前十名持有人</h4><button class="mini" id="gjd-holdings-btn" onclick="refreshGjdData('holdings')" title="每年3月底/8月底ETF年报、半年报披露后点击，自动从东方财富定期报告PDF提取汇金持仓">刷新定期报告</button></div><div id="gjd-narr-anchor"></div></div>
     <div class="gjd-block gjd-narr"><h4>二级信号 · 最近10个交易日（核心7只）<span class="refresh-note" id="gjd-sec-asof"></span></h4><div id="gjd-narr-sec"></div></div>
     <div class="gjd-grid">
       <div class="gjd-block"><h4>规则自动分段（对照）</h4><div id="gjd-cycle-stages"></div></div>
@@ -1174,7 +1174,7 @@ function table(el,cols,rows){
   el.innerHTML=h+'</tbody>';}
 
 const STATIC=!!window.__STATIC_MODE;
-const PAGE_VERSION='eb5dc253de1e';
+const PAGE_VERSION='90414a7f879b';
 const PAGE_DATES={}, LOAD_FAILURES=new Map();
 let DRAWER_SEQ=0, DRAWER_FOCUS=null, ETF_TAB='m', MONITOR_DETAILS=false;
 let ROUTE_RESTORING=false, REVIEW_SELECTED={a:'',us:''};
@@ -1435,24 +1435,27 @@ function renderGjdCycle(g,pulse){
 }
 
 let GJD_REFRESHING=false;
-function gjdFreshText(f){if(!f)return '';const d=v=>v?fmtDate(v):'—';return `份额 ${d(f.flow)} · 溢价 ${d(f.premium)} · 尾盘 ${d(f.minutes)} · 汇金报告期 ${d(f.holdings)}`;}
+function gjdFreshText(f){if(!f)return '';const d=v=>v?fmtDate(v):'—';const h=f.holdings_latest&&f.holdings_latest>f.holdings?`${d(f.holdings)}（上限 ${d(f.holdings_latest)}）`:d(f.holdings);return `份额 ${d(f.flow)} · 溢价 ${d(f.premium)} · 尾盘 ${d(f.minutes)} · 汇金报告期 ${h}`;}
 async function loadGjdFreshness(){if(STATIC)return;try{const j=await jget('/api/etf-gjd/refresh?_='+Date.now());const el=document.getElementById('gjd-fresh');if(el)el.textContent=gjdFreshText(j.freshness);
   const f=j.freshness||{},note=document.getElementById('gjd-refresh-note');
   if(note&&!GJD_REFRESHING){const lag=f.flow&&f.premium&&f.premium<f.flow;note.textContent=lag?'二级数据落后于份额数据，可点“更新数据”补齐。':(j.status==='running'?j.message:'');}}catch(e){}}
-async function refreshGjdData(){
+async function refreshGjdData(only){
   if(GJD_REFRESHING)return;
-  const note=document.getElementById('gjd-refresh-note'),btn=document.getElementById('gjd-refresh-btn');
+  const note=document.getElementById('gjd-refresh-note'),btn=document.getElementById('gjd-refresh-btn'),hbtn=document.getElementById('gjd-holdings-btn');
   if(STATIC){note.textContent='请在本地看板更新数据';return;}
-  GJD_REFRESHING=true;btn.disabled=true;btn.textContent='更新中…';note.textContent='正在更新ETF份额与二级数据（约1–3分钟）…';
+  GJD_REFRESHING=true;if(btn)btn.disabled=true;if(hbtn)hbtn.disabled=true;
+  const activeBtn=only==='holdings'?hbtn:btn;if(activeBtn)activeBtn.textContent='更新中…';
+  note.textContent=only==='holdings'?'正在检查东方财富最新ETF年报/半年报持仓披露…':'正在更新ETF份额、二级与定期报告持仓（约1–3分钟）…';
   try{
-    const r=await fetch('/api/etf-gjd/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+    const r=await fetch('/api/etf-gjd/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(only?{only}:{})});
     let job=await r.json();if(!r.ok)throw Error(job.message||'更新未启动');
-    for(let i=0;job.status==='running'&&i<240;i++){note.textContent=job.message||'更新中…';await new Promise(res=>setTimeout(res,3000));job=await jget('/api/etf-gjd/refresh?_='+Date.now());}
+    const stepMs=only==='holdings'?1000:3000;
+    for(let i=0;job.status==='running'&&i<240;i++){note.textContent=job.message||'更新中…';await new Promise(res=>setTimeout(res,stepMs));job=await jget('/api/etf-gjd/refresh?_='+Date.now());}
     document.getElementById('gjd-fresh').textContent=gjdFreshText(job.freshness);
     await loadEtfEvidence();
     note.textContent=job.message||'更新状态暂不可用';
   }catch(e){note.textContent='更新未完成：'+String(e.message||e)+'；保留已有数据';}
-  finally{GJD_REFRESHING=false;btn.disabled=false;btn.textContent='更新数据';}
+  finally{GJD_REFRESHING=false;if(btn){btn.disabled=false;btn.textContent='更新数据';}if(hbtn){hbtn.disabled=false;hbtn.textContent='刷新定期报告';}}
 }
 function renderGjdLevel(h){
   const sum=document.getElementById('gjd-level-summary'),ck=document.getElementById('gjd-level-checks'),el=document.getElementById('ch-gjd-level');
@@ -1473,8 +1476,8 @@ function renderGjdLevel(h){
       series:[...Object.entries(segs).map(([a,pts],i)=>({name:i===0?'份额外推估算':'估算·'+a,type:'line',showSymbol:false,data:pts,lineStyle:{width:1.8,color:'#3c78b5'},itemStyle:{color:'#3c78b5'},legendHoverLink:false})),
         {name:'定期报告真值',type:'scatter',data:anchors,symbolSize:9,itemStyle:{color:'#c74d4d'},z:5}]},true);
     c.setOption({legend:{data:['份额外推估算','定期报告真值']}});c.resize();}
-  const chk=h.checks||[],bc=h.bound_checks||[];
-  ck.innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>外推回测</th><th>区间</th><th>外推值（亿份）</th><th>下期真值</th><th>误差</th></tr></thead><tbody>${chk.map(x=>`<tr><td>${x.codes}只</td><td>${fmtDate(x.from)} → ${fmtDate(x.to)}</td><td>${x.pred_shares_yi}</td><td>${x.actual_shares_yi}</td><td class="${Math.abs(x.error_pct)>20?'down':''}">${x.error_pct>0?'+':''}${x.error_pct}%</td></tr>`).join('')}${bc.map(b=>`<tr><td>${esc(b.code)}</td><td>${fmtDate(b.date)} 上限核对</td><td>${b.est_shares_yi}</td><td>≤ ${b.max_shares_yi}</td><td>${b.consistent?'一致':'<span class="down">超出上限</span>'}</td></tr>`).join('')}</tbody></table></div><div class="note">${esc(h.note||'')} 汇金不是份额主力时（如2023年）外推会严重高估；再进场阶段新增份额不一定都是汇金，估算偏上限。</div>`;
+  const chk=h.checks||[],bs=h.bound_summary||h.bound_checks||[];
+  ck.innerHTML=`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>外推回测</th><th>区间</th><th>外推值（亿份）</th><th>下期真值</th><th>误差</th></tr></thead><tbody>${chk.map(x=>`<tr><td>${x.codes}只</td><td>${fmtDate(x.from)} → ${fmtDate(x.to)}</td><td>${x.pred_shares_yi}</td><td>${x.actual_shares_yi}</td><td class="${Math.abs(x.error_pct)>20?'down':''}">${x.error_pct>0?'+':''}${x.error_pct}%</td></tr>`).join('')}${bs.map(b=>`<tr><td>${esc(b.code||(b.codes+'只'))}</td><td>${b.from?fmtDate(b.from)+' → ':''}${fmtDate(b.date)} 上限核对</td><td>${b.est_shares_yi}</td><td>≤ ${b.max_shares_yi}</td><td>${b.consistent?(b.consistent_codes&&b.codes>1?`${b.consistent_codes}/${b.codes}只一致`:'一致'):'<span class="down">超出上限</span>'}</td></tr>`).join('')}</tbody></table></div><div class="note">${esc(h.note||'')} 汇金不是份额主力时（如2023年）外推会严重高估；再进场阶段新增份额不一定都是汇金，估算偏上限。</div>`;
 }
 function renderGjdNarrative(n){
   const st=document.getElementById('gjd-narr-stages'), ex=document.getElementById('gjd-narr-exit');
@@ -1492,7 +1495,11 @@ function renderGjdNarrative(n){
     evEl.innerHTML=evs.map(e=>`<span class="gjd-event ${esc(e.type)}" title="${esc(e.text)}">${day(e.date)} ${esc(e.text.length>18?e.text.slice(0,18)+'…':e.text)}</span>`).join('');}
   const secCells=x=>{if(!x)return '<td>—</td><td>—</td>';const lab=x.dominant?`<b>${esc(x.dominant_label)}</b>`:`<span style="color:#9aa3ae">${esc(x.dominant_label||'—')}</span>`;return `<td class="${cls(x.prem_mean_bp)}" title="高分位${x.high_days}天 / 低分位${x.low_days}天">${x.prem_mean_bp==null?'—':(x.prem_mean_bp>0?'+':'')+x.prem_mean_bp.toFixed(1)} / ${x.prem_pct_mean??'—'}</td><td title="z=${x.z??'—'}；尾盘托底${x.tail_support_days}天、尾盘巨量${x.tail_heavy_days}天">${lab}${x.z!=null?' <small>z '+x.z+'</small>':''}${x.tail_support_days?' <small>尾托'+x.tail_support_days+'</small>':''}</td>`;};
   const an=n.anchors||{}, ae=document.getElementById('gjd-narr-anchor');
-  if(ae){ae.innerHTML=an.status!=='ready'?'<div class="note">'+esc(an.reason||'未录入汇金持仓锚点')+'</div>':`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>报告期</th><th>覆盖ETF</th><th>汇金持有（亿份）</th><th>持有市值</th><th>占这些ETF总份额</th><th>较上期持仓变化</th><th>同期份额净申赎</th><th title="汇金持仓变化÷同批代码份额净申赎">汇金占比</th></tr></thead><tbody>${(an.rows||[]).map(r=>`<tr><td>${day(r.report_date)}</td><td>${r.n_codes}只</td><td>${r.huijin_shares_yi??'—'}</td><td>${money(r.huijin_value_yi)}</td><td>${r.share_of_total_pct!=null?r.share_of_total_pct+'%':'—'}</td><td class="${cls(r.delta_value_yi)}">${money(r.delta_value_yi)}</td><td class="${cls(r.proxy_flow_yi)}">${money(r.proxy_flow_yi)}</td><td>${r.huijin_share_of_flow_pct!=null?r.huijin_share_of_flow_pct+'%':'—'}</td></tr>`).join('')}${(an.upper_bounds||[]).map(b=>`<tr><td>${day(b.report_date)}</td><td>${esc(b.code)}</td><td colspan="6" style="text-align:left;white-space:normal">≤ ${b.max_shares_yi} 亿份（上限）：${esc(b.note)}</td></tr>`).join('')}</tbody></table></div><div class="note">${esc(an.note||'')}</div>`;}
+  if(ae){
+    const ubRows=(an.upper_bound_rows||[]).map(r=>`<tr><td>${day(r.report_date)} <small>上限</small></td><td>${r.n_codes}只</td><td>≤ ${r.max_shares_yi??'—'}</td><td>≤ ${money(r.max_value_yi)}</td><td>≤ ${r.share_of_total_pct!=null?r.share_of_total_pct+'%':'—'}</td><td class="${cls(r.delta_value_yi)}">${r.delta_value_yi!=null?'至少 '+money(r.delta_value_yi):'—'}</td><td class="${cls(r.proxy_flow_yi)}">${money(r.proxy_flow_yi)}</td><td>${r.huijin_share_of_flow_pct!=null?'≥ '+r.huijin_share_of_flow_pct+'%':'—'}</td></tr>`).join('');
+    const ubDetail=(an.upper_bounds||[]).length?`<details style="margin-top:4px"><summary class="note" style="cursor:pointer">展开上限期逐只ETF机构持仓明细（${an.upper_bounds.length}条）</summary><div style="overflow:auto;margin-top:4px"><table class="gjd-table"><thead><tr><th>报告期</th><th>代码</th><th>机构合计上限（亿份）</th><th>说明</th></tr></thead><tbody>${(an.upper_bounds||[]).map(b=>`<tr><td>${day(b.report_date)}</td><td>${esc(b.code)}</td><td>≤ ${b.max_shares_yi}</td><td style="text-align:left;white-space:normal">${esc(b.note)}</td></tr>`).join('')}</tbody></table></div></details>`:'';
+    ae.innerHTML=an.status!=='ready'?'<div class="note">'+esc(an.reason||'未录入汇金持仓锚点')+'</div>':`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>报告期</th><th>覆盖ETF</th><th>汇金持有（亿份）</th><th>持有市值</th><th>占这些ETF总份额</th><th>较上期持仓变化</th><th>同期份额净申赎</th><th title="汇金持仓变化÷同批代码份额净申赎">汇金占比</th></tr></thead><tbody>${(an.rows||[]).map(r=>`<tr><td>${day(r.report_date)}</td><td>${r.n_codes}只</td><td>${r.huijin_shares_yi??'—'}</td><td>${money(r.huijin_value_yi)}</td><td>${r.share_of_total_pct!=null?r.share_of_total_pct+'%':'—'}</td><td class="${cls(r.delta_value_yi)}">${money(r.delta_value_yi)}</td><td class="${cls(r.proxy_flow_yi)}">${money(r.proxy_flow_yi)}</td><td>${r.huijin_share_of_flow_pct!=null?r.huijin_share_of_flow_pct+'%':'—'}</td></tr>`).join('')}${ubRows}</tbody></table></div>${ubDetail}<div class="note">${esc(an.note||'')}</div>`;
+  }
   const se=document.getElementById('gjd-narr-sec'), sa=document.getElementById('gjd-sec-asof'), rec=n.secondary_recent||[];
   if(sa)sa.textContent=n.secondary_as_of?'截至 '+day(n.secondary_as_of):'';
   if(se){se.innerHTML=!rec.length?'<div class="note">二级数据未就绪（etf_gjd_secondary.parquet）。</div>':`<div style="overflow:auto"><table class="gjd-table"><thead><tr><th>日期</th><th>二级定性</th><th>溢价 bp</th><th>分位</th><th>尾盘量比</th><th>前段 / 尾盘涨跌</th><th>上证</th><th>核心7份额</th></tr></thead><tbody>${rec.slice().reverse().map(r=>`<tr><td>${day(r.date)}</td><td>${r.cls==='neutral'?'<span style="color:#9aa3ae">中性</span>':'<b>'+esc(r.label)+'</b>'}${r.expiry?' <small>交割日</small>':''}</td><td class="${cls(r.premium_bp)}">${r.premium_bp??'—'}</td><td>${r.prem_pct??'—'}</td><td>${r.tail_ratio!=null?r.tail_ratio.toFixed(2)+'x':'—'}</td><td>${pct(r.pre_ret)} / ${pct(r.tail_ret)}</td><td class="${cls(r.idx_ret)}">${pct(r.idx_ret)}</td><td class="${cls(r.core_flow)}">${r.core_flow==null?'待披露':money(r.core_flow)}</td></tr>`).join('')}</tbody></table></div><div class="note">溢价+申购=二级买盘传导申购；折价+申购=一级直接申购（二级反有抛压）；折价+赎回=二级卖压传导赎回。方向线索，不是账户买卖。</div>`;}
